@@ -1,0 +1,167 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}{{ material.title }}{% endblock %}
+
+{% block heading %}{{ material.title }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'class_subjects' material.subject.class_ref.id %}" style="color: var(--primary); text-decoration: none;">{{ material.subject.class_ref.name }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'subject_materials' material.subject.id %}" style="color: var(--primary); text-decoration: none;">{{ material.subject.name }}</a></li>
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">{{ material.title|truncatechars:25 }}</li>
+{% endblock %}
+
+{% block content_body %}
+<div class="row animate-fade-in">
+    <div class="col-lg-8 mx-auto">
+        <!-- Header -->
+        <div class="revision-detail-header">
+            <div class="d-flex align-items-start gap-3">
+                <div class="revision-section-icon purple" style="width: 56px; height: 56px; font-size: 1.5rem; border-radius: var(--radius-md);">
+                    {% if material.material_type == 'past_paper' %}
+                        <i class="bi bi-file-text"></i>
+                    {% elif material.material_type == 'notes' %}
+                        <i class="bi bi-journal-text"></i>
+                    {% elif material.material_type == 'marking_scheme' %}
+                        <i class="bi bi-check2-square"></i>
+                    {% elif material.material_type == 'syllabus' %}
+                        <i class="bi bi-list-check"></i>
+                    {% elif material.material_type == 'textbook' %}
+                        <i class="bi bi-book"></i>
+                    {% else %}
+                        <i class="bi bi-file-earmark"></i>
+                    {% endif %}
+                </div>
+                <div style="flex: 1; min-width: 0;">
+                    <h3 class="fw-bold mb-2" style="color: var(--dark);">{{ material.title }}</h3>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <span class="revision-badge type">{{ material.get_material_type_display }}</span>
+                        {% if material.is_free %}
+                            <span class="revision-badge free"><i class="bi bi-unlock"></i> Free</span>
+                        {% else %}
+                            <span class="revision-badge paid"><i class="bi bi-lock"></i> KSH {{ material.price }}</span>
+                        {% endif %}
+                        {% if material.material_type == 'marking_scheme' %}
+                            <span class="revision-badge paid"><i class="bi bi-shield-lock"></i> Login Required</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if user.is_authenticated and user.is_staff %}
+            <div class="mt-3">
+                <a href="{% url 'link_material' %}" class="revision-btn revision-btn-secondary" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border: none;">
+                    <i class="bi bi-link-45deg"></i> Link with Marking Scheme or Past Paper
+                </a>
+            </div>
+            {% endif %}
+
+            <div class="revision-detail-meta">
+                <div class="revision-detail-meta-item">
+                    <small>Subject</small>
+                    <div class="fw-bold">{{ material.subject.name }}</div>
+                </div>
+                <div class="revision-detail-meta-item">
+                    <small>Class</small>
+                    <div class="fw-bold">{{ material.subject.class_ref.name }}</div>
+                </div>
+                <div class="revision-detail-meta-item">
+                    <small>Curriculum</small>
+                    <div>
+                        {% if material.subject.class_ref.curriculum == 'cbe' %}
+                            <span class="revision-badge cbe">CBE</span>
+                        {% else %}
+                            <span class="revision-badge f844">8-4-4</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="revision-detail-meta-item">
+                    <small>Level</small>
+                    <div class="fw-bold">{{ material.subject.class_ref.get_level_display }}</div>
+                </div>
+                <div class="revision-detail-meta-item">
+                    <small>Downloads</small>
+                    <div class="fw-bold" style="color: var(--accent);"><i class="bi bi-download"></i> {{ material.download_count }}</div>
+                </div>
+                {% if material.year %}
+                <div class="revision-detail-meta-item">
+                    <small>Year</small>
+                    <div class="fw-bold">{{ material.year }}</div>
+                </div>
+                {% endif %}
+                {% if material.term %}
+                <div class="revision-detail-meta-item">
+                    <small>Term</small>
+                    <div class="fw-bold">{{ material.get_term_display }}</div>
+                </div>
+                {% endif %}
+                <div class="revision-detail-meta-item">
+                    <small>Added</small>
+                    <div class="fw-bold">{{ material.created_at|date:"M d, Y" }}</div>
+                </div>
+            </div>
+        </div>
+
+        {% if material.description %}
+        <div class="revision-section animate-fade-in">
+            <h6 class="fw-bold mb-2" style="color: var(--dark);"><i class="bi bi-card-text" style="color: var(--primary);"></i> Description</h6>
+            <p class="text-muted mb-0" style="line-height: 1.7;">{{ material.description }}</p>
+        </div>
+        {% endif %}
+
+        {% if material.related_material %}
+        <div class="revision-section animate-fade-in" style="background: linear-gradient(135deg, #fffbeb, #fef3c7); border-left: 4px solid var(--accent);">
+            <h6 class="fw-bold mb-2" style="color: #92400e;">
+                <i class="bi bi-link-45deg"></i>
+                {% if material.material_type == 'past_paper' %}
+                    Related Marking Scheme
+                {% elif material.material_type == 'marking_scheme' %}
+                    Related Past Paper
+                {% else %}
+                    Related Material
+                {% endif %}
+            </h6>
+            <p class="mb-3" style="color: #78350f; font-size: 0.9rem;">
+                {{ material.related_material.title }} - {{ material.related_material.get_material_type_display }}
+            </p>
+            <a href="{% url 'material_detail' material.related_material.id %}" class="revision-btn" style="background: var(--accent); color: #fff; border: none;">
+                <i class="bi bi-arrow-right-circle"></i> View {{ material.related_material.get_material_type_display }}
+            </a>
+        </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="d-grid gap-2 mt-4 animate-fade-in">
+            <a href="{% url 'preview_material' material.id %}" class="revision-btn revision-btn-primary" style="justify-content: center; padding: 0.85rem; font-size: 1rem; border-radius: var(--radius-md);">
+                <i class="bi bi-eye"></i> Preview Content
+            </a>
+            <a href="{% url 'download_material' material.id %}" class="revision-btn revision-btn-success" style="justify-content: center; padding: 0.85rem; font-size: 1rem; border-radius: var(--radius-md); border: none;">
+                <i class="bi bi-download"></i> Download Material
+            </a>
+            <p class="text-center text-muted small mb-0 mt-2">
+                <i class="bi bi-info-circle"></i>
+                {% if material.is_free %}
+                    This material is free to download. Use the preview to see a sample first.
+                {% else %}
+                    Payment of KSH {{ material.price }} is required to download. Preview shows first pages for free.
+                {% endif %}
+            </p>
+        </div>
+    </div>
+</div>
+
+<div class="d-flex justify-content-between mt-4 animate-fade-in">
+    <a href="{% url 'subject_materials' material.subject.id %}" class="revision-btn revision-btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to {{ material.subject.name }}
+    </a>
+    <div class="d-flex gap-2">
+        {% if user.is_authenticated and user.is_staff %}
+        <a href="{% url 'link_material' %}" class="revision-btn revision-btn-secondary" style="background: linear-gradient(135deg, #fef3c7, #fde68a); color: #92400e; border: none;">
+            <i class="bi bi-link-45deg"></i> Link Material
+        </a>
+        {% endif %}
+        <a href="{% url 'revision_home' %}" class="revision-btn revision-btn-primary">
+            <i class="bi bi-house"></i> Revision Home
+        </a>
+    </div>
+</div>
+{% endblock %}

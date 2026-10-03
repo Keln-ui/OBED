@@ -1,0 +1,91 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Link Materials{% endblock %}
+
+{% block heading %}
+    <span><i class="bi bi-link-45deg" style="color: var(--primary);"></i> Link Related Materials</span>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'revision_home' %}" style="color: var(--primary); text-decoration: none;">Revision Home</a></li>
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">Link Materials</li>
+{% endblock %}
+
+{% block content_body %}
+<div class="row animate-fade-in">
+    <div class="col-lg-8 mx-auto">
+        <div class="revision-section">
+            <div class="mb-4">
+                <h5 class="fw-bold mb-2" style="color: var(--dark);">Link Past Paper with Marking Scheme</h5>
+                <p class="text-muted mb-0">Connect a past paper to its corresponding marking scheme so students can easily find both materials together.</p>
+            </div>
+
+            {% if messages %}
+            <div class="mb-4">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" style="border-radius: var(--radius-sm); border: none;">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form method="POST" action="{% url 'link_material' %}">
+                {% csrf_token %}
+                
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="color: var(--dark);">
+                        <i class="bi bi-file-text" style="color: var(--primary);"></i> Select Past Paper
+                    </label>
+                    <select name="material_id" class="form-select" required style="border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200); padding: 0.7rem;">
+                        <option value="">-- Choose a past paper --</option>
+                        {% for material in past_papers %}
+                        <option value="{{ material.id }}">
+                            {{ material.title }} - {{ material.subject.name }} ({{ material.subject.class_ref.name }}) 
+                            {% if material.year %}[{{ material.year }}]{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label fw-bold mb-2" style="color: var(--dark);">
+                        <i class="bi bi-check2-square" style="color: var(--primary);"></i> Select Marking Scheme
+                    </label>
+                    <select name="related_material_id" class="form-select" required style="border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200); padding: 0.7rem;">
+                        <option value="">-- Choose a marking scheme --</option>
+                        {% for material in marking_schemes %}
+                        <option value="{{ material.id }}">
+                            {{ material.title }} - {{ material.subject.name }} ({{ material.subject.class_ref.name }})
+                            {% if material.year %}[{{ material.year }}]{% endif %}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="revision-section" style="background: var(--primary-light); border-left: 4px solid var(--primary);">
+                    <h6 class="fw-bold mb-2" style="color: var(--primary-dark);">
+                        <i class="bi bi-info-circle"></i> How it works
+                    </h6>
+                    <ul class="mb-0 text-muted small" style="line-height: 1.8;">
+                        <li>Select a past paper from the first dropdown</li>
+                        <li>Select its corresponding marking scheme from the second dropdown</li>
+                        <li>Click "Link Materials" to connect them</li>
+                        <li>Students will see a link to the marking scheme when viewing the past paper (and vice versa)</li>
+                    </ul>
+                </div>
+
+                <div class="d-grid gap-2 mt-4">
+                    <button type="submit" class="revision-btn revision-btn-primary" style="justify-content: center; padding: 0.85rem; font-size: 1rem; border-radius: var(--radius-md);">
+                        <i class="bi bi-link-45deg"></i> Link Materials
+                    </button>
+                    <a href="{% url 'revision_home' %}" class="revision-btn revision-btn-secondary" style="justify-content: center;">
+                        <i class="bi bi-arrow-left"></i> Back to Revision Home
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

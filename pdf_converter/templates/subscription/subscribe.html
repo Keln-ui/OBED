@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subscribe - {{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="text-center mb-4">
+                <h1 class="display-5">💳 Subscribe</h1>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="card shadow">
+                <div class="card-header bg-success text-white text-center">
+                    <h4 class="mb-0">{{ plan.name }}</h4>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h2 class="text-success">{{ plan.amount }} KSH</h2>
+                        <p class="text-muted">{{ plan.get_duration_display }}</p>
+                    </div>
+
+                    <h5>Plan Includes:</h5>
+                    <ul>
+                        <li>Full document conversion access</li>
+                        <li>PDF to Word, PowerPoint, HTML & more</li>
+                        <li>OCR for scanned documents</li>
+                        <li>Priority support</li>
+                    </ul>
+
+                    <hr>
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">M-Pesa Phone Number <span class="text-danger">*</span></label>
+                            {{ form.phone_number }}
+                            <div class="form-text">Enter the M-Pesa registered phone number for payment.</div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success btn-lg">
+                                <i class="bi bi-phone"></i> Pay {{ plan.amount }} KSH via M-Pesa
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="text-center mt-3">
+                <a href="{% url 'subscription_plans' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left"></i> Back to Plans
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

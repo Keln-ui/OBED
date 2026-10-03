@@ -1,0 +1,128 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Browse{% endblock %}
+
+{% block heading %}
+    <span><i class="bi bi-search" style="color: var(--primary);"></i> Browse Materials</span>
+{% endblock %}
+
+{% block content_body %}
+<!-- Filters -->
+<div class="revision-filter-bar animate-fade-in">
+    <div class="d-flex align-items-center gap-2 me-auto">
+        <div class="revision-stat-icon purple" style="width: 36px; height: 36px; font-size: 1rem; background: var(--primary-light); color: var(--primary);">
+            <i class="bi bi-funnel"></i>
+        </div>
+        <span class="fw-bold" style="color: var(--dark);">Filters</span>
+    </div>
+    <form method="get" class="d-flex align-items-end gap-2 flex-wrap flex-grow-1">
+        <select class="form-select" name="curriculum" style="border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);">
+            <option value="">All Curricula</option>
+            {% for value, label in curricula %}
+                <option value="{{ value }}" {% if selected_curriculum == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select class="form-select" name="level" style="border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);">
+            <option value="">All Levels</option>
+            {% for value, label in levels %}
+                <option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select class="form-select" name="type" style="border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);">
+            <option value="">All Types</option>
+            {% for value, label in types %}
+                <option value="{{ value }}" {% if selected_type == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="revision-btn revision-btn-primary">
+            <i class="bi bi-search"></i> Apply
+        </button>
+        <a href="{% url 'browse_materials' %}" class="revision-btn revision-btn-secondary">
+            <i class="bi bi-x-circle"></i> Clear
+        </a>
+    </form>
+</div>
+
+<!-- Results -->
+<div class="revision-toolbar animate-fade-in">
+    <div class="revision-toolbar-title">
+        <i class="bi bi-grid" style="color: var(--primary);"></i> Results
+        <span class="badge">{{ materials.count }} materials found</span>
+    </div>
+</div>
+
+<!-- Materials Grid -->
+{% if materials %}
+<div class="revision-card-grid animate-fade-in">
+    {% for material in materials %}
+    <div class="revision-card">
+        <div class="revision-card-header">
+            <div class="revision-card-icon">
+                {% if material.material_type == 'past_paper' %}
+                    <i class="bi bi-file-text"></i>
+                {% elif material.material_type == 'notes' %}
+                    <i class="bi bi-journal-text"></i>
+                {% elif material.material_type == 'marking_scheme' %}
+                    <i class="bi bi-check2-square"></i>
+                {% elif material.material_type == 'syllabus' %}
+                    <i class="bi bi-list-check"></i>
+                {% elif material.material_type == 'textbook' %}
+                    <i class="bi bi-book"></i>
+                {% else %}
+                    <i class="bi bi-file-earmark"></i>
+                {% endif %}
+            </div>
+            <div style="min-width: 0; flex: 1;">
+                <div class="revision-card-title">{{ material.title|truncatechars:35 }}</div>
+                <div class="revision-card-subtitle">
+                    {{ material.subject.name }}
+                    {% if material.subject.class_ref.curriculum == 'cbe' %}
+                        <span class="revision-badge cbe">CBE</span>
+                    {% else %}
+                        <span class="revision-badge f844">8-4-4</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        {% if material.year %}
+            <div class="revision-card-body">
+                <span class="revision-badge muted">{{ material.year }}</span>
+                {% if material.term %}
+                    <span class="revision-badge muted">{{ material.get_term_display }}</span>
+                {% endif %}
+            </div>
+        {% endif %}
+
+        {% if material.description %}
+            <div class="revision-card-body">{{ material.description|truncatechars:90 }}</div>
+        {% endif %}
+
+        <div class="revision-card-footer">
+            <span style="font-size: 0.82rem; color: var(--gray-500);"><i class="bi bi-download"></i> {{ material.download_count }}</span>
+            {% if material.is_free %}
+                <span class="revision-badge free"><i class="bi bi-unlock"></i> Free</span>
+            {% else %}
+                <span class="revision-badge paid"><i class="bi bi-lock"></i> KSH {{ material.price }}</span>
+            {% endif %}
+        </div>
+
+        <div class="d-flex gap-2 mt-3">
+            <a href="{% url 'preview_material' material.id %}" class="revision-btn revision-btn-secondary flex-fill" style="justify-content: center;">
+                <i class="bi bi-eye"></i> Preview
+            </a>
+            <a href="{% url 'material_detail' material.id %}" class="revision-btn revision-btn-primary flex-fill" style="justify-content: center;">
+                <i class="bi bi-info-circle"></i> Details
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="revision-empty animate-fade-in">
+    <div class="revision-empty-icon"><i class="bi bi-exclamation-triangle"></i></div>
+    <h6>No Results Found</h6>
+    <p>No materials found matching your filters. Try adjusting your search criteria.</p>
+</div>
+{% endif %}
+{% endblock %}

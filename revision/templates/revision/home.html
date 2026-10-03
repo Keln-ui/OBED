@@ -1,0 +1,347 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Home{% endblock %}
+
+{% block heading %}
+    <span><i class="bi bi-book-fill" style="color: var(--primary);"></i> Revision Materials</span>
+{% endblock %}
+
+{% block content_body %}
+<!-- Hero -->
+<div class="revision-hero">
+    <div class="revision-hero-content">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="revision-hero-actions mb-3">
+                    <span class="badge" style="background: rgba(99,102,241,0.08); color: var(--primary-dark); padding: 0.35rem 0.85rem; border-radius: 100px; font-size: 0.8rem; font-weight: 600;">
+                        <i class="bi bi-mortarboard-fill"></i> Study Resources
+                    </span>
+                </div>
+                <h1>Your Complete Revision Resource Hub</h1>
+                <p>Access past papers, marking schemes, notes, and textbooks for both CBE and 8-4-4 curricula. Organized by class and subject for easy navigation.</p>
+                <div class="revision-hero-actions">
+                    <a href="{% url 'browse_materials' %}" class="revision-btn revision-btn-primary" style="padding: 0.65rem 1.25rem; font-size: 0.9rem;">
+                        <i class="bi bi-search"></i> Browse All Materials
+                    </a>
+                    <a href="{% url 'browse_by_subject' %}" class="revision-btn revision-btn-secondary" style="padding: 0.65rem 1.25rem; font-size: 0.9rem;">
+                        <i class="bi bi-book"></i> Browse by Subject
+                    </a>
+                    {% if recent_materials %}
+                    <a href="#recent-materials" class="revision-btn revision-btn-secondary" style="padding: 0.65rem 1.25rem; font-size: 0.9rem;">
+                        <i class="bi bi-clock-history"></i> Latest Uploads
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="col-lg-5 mt-3 mt-lg-0">
+                <div class="revision-stat-grid" style="margin-bottom: 0;">
+                    <div class="revision-stat-card">
+                        <div class="revision-stat-icon purple"><i class="bi bi-collection"></i></div>
+                        <div>
+                            <div class="revision-stat-value">{{ total_materials }}</div>
+                            <div class="revision-stat-label">Total Resources</div>
+                        </div>
+                    </div>
+                    <div class="revision-stat-card">
+                        <div class="revision-stat-icon green"><i class="bi bi-stars"></i></div>
+                        <div>
+                            <div class="revision-stat-value">{{ free_count }}</div>
+                            <div class="revision-stat-label">Free Materials</div>
+                        </div>
+                    </div>
+                    <div class="revision-stat-card">
+                        <div class="revision-stat-icon amber"><i class="bi bi-arrow-down-circle"></i></div>
+                        <div>
+                            <div class="revision-stat-value">{{ total_downloads }}</div>
+                            <div class="revision-stat-label">Downloads</div>
+                        </div>
+                    </div>
+                    <div class="revision-stat-card">
+                        <div class="revision-stat-icon blue"><i class="bi bi-mortarboard"></i></div>
+                        <div>
+                            <div class="revision-stat-value">{{ cbe_total|add:eight_four_total }}</div>
+                            <div class="revision-stat-label">Classes</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="revision-stat-grid">
+    <div class="revision-stat-card">
+        <div class="revision-stat-icon purple"><i class="bi bi-collection"></i></div>
+        <div>
+            <div class="revision-stat-value">{{ total_materials }}</div>
+            <div class="revision-stat-label">Total Materials</div>
+        </div>
+    </div>
+    <div class="revision-stat-card">
+        <div class="revision-stat-icon green"><i class="bi bi-stars"></i></div>
+        <div>
+            <div class="revision-stat-value">{{ free_count }}</div>
+            <div class="revision-stat-label">Free Resources</div>
+        </div>
+    </div>
+    <div class="revision-stat-card">
+        <div class="revision-stat-icon amber"><i class="bi bi-crown"></i></div>
+        <div>
+            <div class="revision-stat-value">{{ premium_count }}</div>
+            <div class="revision-stat-label">Premium Resources</div>
+        </div>
+    </div>
+    <div class="revision-stat-card">
+        <div class="revision-stat-icon blue"><i class="bi bi-arrow-down-circle"></i></div>
+        <div>
+            <div class="revision-stat-value">{{ total_downloads }}</div>
+            <div class="revision-stat-label">Total Downloads</div>
+        </div>
+    </div>
+</div>
+
+<!-- CBE Curriculum -->
+<div class="revision-section">
+    <div class="revision-section-header">
+        <div class="revision-section-icon purple"><i class="bi bi-mortarboard"></i></div>
+        <h3 class="revision-section-title">CBE Curriculum</h3>
+        <span class="revision-section-badge">{{ cbe_total }} classes</span>
+    </div>
+
+    <div class="row g-3">
+        {% if cbe_primary %}
+        <div class="col-lg-4 col-md-6">
+            <div class="revision-level-card">
+                <div class="revision-level-header">
+                    <div class="revision-level-icon purple"><i class="bi bi-person-workspace"></i></div>
+                    <div>
+                        <div class="revision-level-title">Primary School</div>
+                        <div class="revision-level-count">{{ cbe_primary|length }} classes</div>
+                    </div>
+                </div>
+                <ul class="revision-class-list">
+                    {% for class in cbe_primary %}
+                    <li>
+                        <a href="{% url 'class_subjects' class.id %}" class="revision-class-link">
+                            <span>{{ class.name }}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if cbe_secondary %}
+        <div class="col-lg-4 col-md-6">
+            <div class="revision-level-card">
+                <div class="revision-level-header">
+                    <div class="revision-level-icon purple"><i class="bi bi-people"></i></div>
+                    <div>
+                        <div class="revision-level-title">Secondary School</div>
+                        <div class="revision-level-count">{{ cbe_secondary|length }} classes</div>
+                    </div>
+                </div>
+                <ul class="revision-class-list">
+                    {% for class in cbe_secondary %}
+                    <li>
+                        <a href="{% url 'class_subjects' class.id %}" class="revision-class-link">
+                            <span>{{ class.name }}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if cbe_college %}
+        <div class="col-lg-4 col-md-6">
+            <div class="revision-level-card">
+                <div class="revision-level-header">
+                    <div class="revision-level-icon purple"><i class="bi bi-building"></i></div>
+                    <div>
+                        <div class="revision-level-title">College / University</div>
+                        <div class="revision-level-count">{{ cbe_college|length }} classes</div>
+                    </div>
+                </div>
+                <ul class="revision-class-list">
+                    {% for class in cbe_college %}
+                    <li>
+                        <a href="{% url 'class_subjects' class.id %}" class="revision-class-link">
+                            <span>{{ class.name }}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 8-4-4 Curriculum -->
+<div class="revision-section">
+    <div class="revision-section-header">
+        <div class="revision-section-icon green"><i class="bi bi-bookmarks"></i></div>
+        <h3 class="revision-section-title">8-4-4 Curriculum</h3>
+        <span class="revision-section-badge">{{ eight_four_total }} classes</span>
+    </div>
+
+    <div class="row g-3">
+        {% if eight_four_primary %}
+        <div class="col-lg-4 col-md-6">
+            <div class="revision-level-card">
+                <div class="revision-level-header">
+                    <div class="revision-level-icon green"><i class="bi bi-person-workspace"></i></div>
+                    <div>
+                        <div class="revision-level-title">Primary School</div>
+                        <div class="revision-level-count">{{ eight_four_primary|length }} classes</div>
+                    </div>
+                </div>
+                <ul class="revision-class-list">
+                    {% for class in eight_four_primary %}
+                    <li>
+                        <a href="{% url 'class_subjects' class.id %}" class="revision-class-link">
+                            <span>{{ class.name }}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if eight_four_secondary %}
+        <div class="col-lg-4 col-md-6">
+            <div class="revision-level-card">
+                <div class="revision-level-header">
+                    <div class="revision-level-icon green"><i class="bi bi-people"></i></div>
+                    <div>
+                        <div class="revision-level-title">Secondary School</div>
+                        <div class="revision-level-count">{{ eight_four_secondary|length }} classes</div>
+                    </div>
+                </div>
+                <ul class="revision-class-list">
+                    {% for class in eight_four_secondary %}
+                    <li>
+                        <a href="{% url 'class_subjects' class.id %}" class="revision-class-link">
+                            <span>{{ class.name }}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if eight_four_college %}
+        <div class="col-lg-4 col-md-6">
+            <div class="revision-level-card">
+                <div class="revision-level-header">
+                    <div class="revision-level-icon green"><i class="bi bi-building"></i></div>
+                    <div>
+                        <div class="revision-level-title">College / University</div>
+                        <div class="revision-level-count">{{ eight_four_college|length }} classes</div>
+                    </div>
+                </div>
+                <ul class="revision-class-list">
+                    {% for class in eight_four_college %}
+                    <li>
+                        <a href="{% url 'class_subjects' class.id %}" class="revision-class-link">
+                            <span>{{ class.name }}</span>
+                            <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Quick Links -->
+<div class="revision-section">
+    <div class="revision-section-header">
+        <div class="revision-section-icon purple"><i class="bi bi-lightning"></i></div>
+        <h3 class="revision-section-title">Quick Access</h3>
+    </div>
+    <div class="revision-quick-links">
+        <a href="{% url 'browse_materials' %}" class="revision-quick-link">
+            <i class="bi bi-search"></i> Browse All Materials
+        </a>
+        <a href="{% url 'browse_by_subject' %}" class="revision-quick-link">
+            <i class="bi bi-book"></i> Browse by Subject
+        </a>
+        <a href="{% url 'browse_schemes' %}" class="revision-quick-link">
+            <i class="bi bi-calendar-week"></i> Schemes of Work
+        </a>
+        {% if user.is_authenticated and user.is_staff %}
+        <a href="{% url 'generate_scheme_of_work' %}" class="revision-quick-link">
+            <i class="bi bi-plus-circle"></i> Generate Scheme of Work
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Recent Materials -->
+{% if recent_materials %}
+<div class="revision-section" id="recent-materials">
+    <div class="revision-section-header">
+        <div class="revision-section-icon purple"><i class="bi bi-clock-history"></i></div>
+        <h3 class="revision-section-title">Recently Added Materials</h3>
+        <span class="revision-section-badge">{{ recent_materials|length }} latest</span>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Subject</th>
+                    <th>Class</th>
+                    <th>Type</th>
+                    <th>Curriculum</th>
+                    <th>Downloads</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for material in recent_materials %}
+                <tr>
+                    <td>
+                        <div class="revision-material-title">{{ material.title|truncatechars:35 }}</div>
+                    </td>
+                    <td style="color: var(--gray-500);">{{ material.subject.name }}</td>
+                    <td style="color: var(--gray-500);">{{ material.subject.class_ref.name }}</td>
+                    <td>
+                        <span class="revision-badge type">{{ material.get_material_type_display }}</span>
+                    </td>
+                    <td>
+                        {% if material.subject.class_ref.curriculum == 'cbe' %}
+                            <span class="revision-badge cbe">CBE</span>
+                        {% else %}
+                            <span class="revision-badge f844">8-4-4</span>
+                        {% endif %}
+                    </td>
+                    <td style="color: var(--gray-500);"><i class="bi bi-download"></i> {{ material.download_count }}</td>
+                    <td>
+                        <a href="{% url 'material_detail' material.id %}" class="revision-btn revision-btn-primary">
+                            <i class="bi bi-eye"></i> View
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

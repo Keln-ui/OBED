@@ -1,0 +1,71 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Generate Scheme of Work{% endblock %}
+
+{% block heading %}
+    <span><i class="bi bi-calendar-week" style="color: var(--primary);"></i> Generate Scheme of Work</span>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">Generate Scheme of Work</li>
+{% endblock %}
+
+{% block content_body %}
+<div class="revision-section animate-fade-in">
+    <p class="text-muted mb-4">Create a scheme of work for your class. The generated file will be saved as a revision material.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form.class_ref.label_tag }}
+                    {{ form.class_ref }}
+                    {{ form.class_ref.errors }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form.subject.label_tag }}
+                    {{ form.subject }}
+                    {{ form.subject.errors }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    {{ form.term.label_tag }}
+                    {{ form.term }}
+                    {{ form.term.errors }}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    {{ form.weeks_count.label_tag }}
+                    {{ form.weeks_count }}
+                    {{ form.weeks_count.errors }}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form.topics.label_tag }}
+            {{ form.topics }}
+            {{ form.topics.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.objectives.label_tag }}
+            {{ form.objectives }}
+            {{ form.objectives.errors }}
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'revision_home' %}" class="revision-btn revision-btn-secondary">Cancel</a>
+            <button type="submit" class="revision-btn revision-btn-primary">Generate Scheme of Work</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,66 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}{{ class_obj.name }}{% endblock %}
+
+{% block heading %}{{ class_obj.name }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'revision_home' %}" style="color: var(--primary); text-decoration: none;">Revision Home</a></li>
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">{{ class_obj.name }}</li>
+{% endblock %}
+
+{% block content_body %}
+<!-- Class Info -->
+<div class="revision-detail-header animate-fade-in">
+    <div class="d-flex align-items-center gap-3">
+        <div class="revision-section-icon purple" style="width: 56px; height: 56px; font-size: 1.5rem; border-radius: var(--radius-md);">
+            <i class="bi bi-mortarboard"></i>
+        </div>
+        <div>
+            <h3 class="fw-bold mb-1" style="color: var(--dark);">{{ class_obj.name }}</h3>
+            <div class="d-flex gap-2">
+                <span class="revision-badge cbe">{{ class_obj.get_curriculum_display }}</span>
+                <span class="revision-badge f844">{{ class_obj.get_level_display }}</span>
+            </div>
+        </div>
+    </div>
+    {% if class_obj.description %}
+        <p class="text-muted mb-0 mt-3" style="line-height: 1.7;">{{ class_obj.description }}</p>
+    {% endif %}
+</div>
+
+<!-- Subjects Grid -->
+{% if subjects %}
+<div class="revision-card-grid animate-fade-in">
+    {% for subject in subjects %}
+    <a href="{% url 'subject_materials' subject.id %}" class="revision-card">
+        <div class="revision-card-header">
+            <div class="revision-card-icon"><i class="bi bi-book"></i></div>
+            <div style="min-width: 0; flex: 1;">
+                <div class="revision-card-title">{{ subject.name }}</div>
+                {% if subject.description %}
+                    <div class="revision-card-subtitle">{{ subject.description|truncatechars:60 }}</div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="revision-card-footer">
+            <span class="revision-badge muted"><i class="bi bi-file-earmark"></i> {{ subject.materials.count }} materials</span>
+            <i class="bi bi-arrow-right-circle" style="color: var(--primary);"></i>
+        </div>
+    </a>
+    {% endfor %}
+</div>
+{% else %}
+<div class="revision-empty animate-fade-in">
+    <div class="revision-empty-icon"><i class="bi bi-exclamation-triangle"></i></div>
+    <h6>No Subjects Available</h6>
+    <p>No subjects available for this class yet. Please check back later.</p>
+</div>
+{% endif %}
+
+<div class="mt-4 animate-fade-in">
+    <a href="{% url 'revision_home' %}" class="revision-btn revision-btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to Revision Materials
+    </a>
+</div>
+{% endblock %}

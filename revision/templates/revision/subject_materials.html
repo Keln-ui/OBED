@@ -1,0 +1,124 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}{{ subject.name }}{% endblock %}
+
+{% block heading %}{{ subject.name }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'class_subjects' subject.class_ref.id %}" style="color: var(--primary); text-decoration: none;">{{ subject.class_ref.name }}</a></li>
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">{{ subject.name }}</li>
+{% endblock %}
+
+{% block content_body %}
+<!-- Subject Header -->
+<div class="revision-section animate-fade-in">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+        <div>
+            <h3 class="fw-bold mb-2" style="color: var(--dark);">{{ subject.name }}</h3>
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="revision-badge cbe">{{ subject.class_ref.get_curriculum_display }}</span>
+                <span class="revision-badge f844">{{ subject.class_ref.get_level_display }}</span>
+                <span class="revision-badge muted"><i class="bi bi-people"></i> {{ subject.class_ref.name }}</span>
+            </div>
+            {% if subject.description %}
+                <p class="text-muted mb-0 mt-2" style="line-height: 1.7;">{{ subject.description }}</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if materials_by_type %}
+    {% for type_name, type_materials in materials_by_type.items %}
+    <div class="revision-section animate-fade-in">
+        <div class="revision-section-header">
+            <div class="revision-section-icon purple"><i class="bi bi-folder"></i></div>
+            <h3 class="revision-section-title">{{ type_name }}</h3>
+            <span class="revision-section-badge">{{ type_materials|length }}</span>
+        </div>
+
+        <div class="revision-card-grid">
+            {% for material in type_materials %}
+            <div class="revision-card">
+                <div class="revision-card-header">
+                    <div class="revision-card-icon">
+                        {% if material.material_type == 'past_paper' %}
+                            <i class="bi bi-file-text"></i>
+                        {% elif material.material_type == 'notes' %}
+                            <i class="bi bi-journal-text"></i>
+                        {% elif material.material_type == 'marking_scheme' %}
+                            <i class="bi bi-check2-square"></i>
+                        {% elif material.material_type == 'syllabus' %}
+                            <i class="bi bi-list-check"></i>
+                        {% elif material.material_type == 'textbook' %}
+                            <i class="bi bi-book"></i>
+                        {% else %}
+                            <i class="bi bi-file-earmark"></i>
+                        {% endif %}
+                    </div>
+                    <div style="min-width: 0; flex: 1;">
+                        <div class="revision-card-title">{{ material.title|truncatechars:40 }}</div>
+                        <div class="revision-card-subtitle">
+                            <span class="revision-badge muted">{{ material.get_term_display }}</span>
+                            {% if material.year %}
+                                <span class="revision-badge muted">{{ material.year }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if material.description %}
+                    <div class="revision-card-body">{{ material.description|truncatechars:90 }}</div>
+                {% endif %}
+
+                <div class="revision-card-footer">
+                    <span style="font-size: 0.82rem; color: var(--gray-500);"><i class="bi bi-download"></i> {{ material.download_count }} downloads</span>
+                    <div class="d-flex gap-1">
+                        {% if material.material_type == 'past_paper' and material.related_material %}
+                            <a href="{% url 'material_detail' material.related_material.id %}" class="revision-badge paid" style="text-decoration: none; cursor: pointer;">
+                                <i class="bi bi-check2-square"></i> Has Marking Scheme
+                            </a>
+                        {% elif material.material_type == 'marking_scheme' and material.related_material %}
+                            <a href="{% url 'material_detail' material.related_material.id %}" class="revision-badge cbe" style="text-decoration: none; cursor: pointer;">
+                                <i class="bi bi-file-text"></i> Has Past Paper
+                            </a>
+                        {% endif %}
+                        {% if material.material_type == 'marking_scheme' %}
+                            <span class="revision-badge paid"><i class="bi bi-shield-lock"></i> Login Required</span>
+                        {% elif material.is_free %}
+                            <span class="revision-badge free"><i class="bi bi-unlock"></i> Free</span>
+                        {% else %}
+                            <span class="revision-badge paid"><i class="bi bi-lock"></i> KSH {{ material.price }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <a href="{% url 'preview_material' material.id %}" class="revision-btn revision-btn-secondary flex-fill" style="justify-content: center;">
+                        <i class="bi bi-eye"></i> Preview
+                    </a>
+                    <a href="{% url 'material_detail' material.id %}" class="revision-btn revision-btn-primary flex-fill" style="justify-content: center;">
+                        <i class="bi bi-info-circle"></i> Details
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endfor %}
+{% else %}
+<div class="revision-empty animate-fade-in">
+    <div class="revision-empty-icon"><i class="bi bi-exclamation-triangle"></i></div>
+    <h6>No Materials Available</h6>
+    <p>No materials available for this subject yet. Please check back later.</p>
+</div>
+{% endif %}
+
+<div class="d-flex gap-2 mt-4 animate-fade-in">
+    <a href="{% url 'class_subjects' subject.class_ref.id %}" class="revision-btn revision-btn-secondary">
+        <i class="bi bi-arrow-left"></i> Back to {{ subject.class_ref.name }}
+    </a>
+    <a href="{% url 'revision_home' %}" class="revision-btn revision-btn-primary">
+        <i class="bi bi-house"></i> Revision Home
+    </a>
+</div>
+{% endblock %}

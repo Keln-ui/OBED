@@ -1,0 +1,134 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Preview - {{ material.title }}{% endblock %}
+
+{% block heading %}Preview: {{ material.title }}{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'class_subjects' material.subject.class_ref.id %}" style="color: var(--primary); text-decoration: none;">{{ material.subject.class_ref.name }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'subject_materials' material.subject.id %}" style="color: var(--primary); text-decoration: none;">{{ material.subject.name }}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'material_detail' material.id %}" style="color: var(--primary); text-decoration: none;">{{ material.title|truncatechars:20 }}</a></li>
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">Preview</li>
+{% endblock %}
+
+{% block content_body %}
+<div class="row animate-fade-in">
+    <div class="col-12">
+        <div class="revision-preview-banner">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <div>
+                    <h4><i class="bi bi-eye-fill"></i> Content Preview</h4>
+                    <p class="mb-0">
+                        {% if preview_available %}
+                            Showing first {{ preview_pages }} page{{ preview_pages|pluralize }}
+                            {% if total_pages > preview_pages %}
+                                of {{ total_pages }} ({{ total_pages|add:"-1" }} more pages hidden)
+                            {% endif %}
+                            — {{ file_type }} file
+                        {% else %}
+                            Preview not available for this file type
+                        {% endif %}
+                    </p>
+                </div>
+                <span class="badge bg-white text-dark fs-6 px-3 py-2" style="border-radius: var(--radius-sm);">
+                    <i class="bi bi-file-earmark-text"></i> {{ file_type|default:"File" }}
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4 animate-fade-in">
+    <div class="col-lg-8">
+        <div class="revision-section">
+            <div class="revision-section-header" style="border-bottom: 1px solid var(--gray-100); padding-bottom: 0.75rem; margin-bottom: 1rem;">
+                <div class="revision-section-icon purple"><i class="bi bi-file-text"></i></div>
+                <h3 class="revision-section-title" style="margin: 0;">Document Overview</h3>
+            </div>
+            <div class="revision-preview-box">
+                {% if preview_available and preview_text %}
+                    {{ preview_text|escape|linebreaksbr }}
+                    {% if total_pages > preview_pages %}
+                        <div class="alert mt-3 mb-0 d-flex align-items-center" style="background: var(--primary-light); color: var(--primary-dark); border: none; border-radius: var(--radius-sm);">
+                            <i class="bi bi-info-circle-fill me-2"></i>
+                            <span>This is a partial preview.
+                                {% if material.is_free %}
+                                    <strong>Download the full document</strong> to access all {{ total_pages }} pages.
+                                {% else %}
+                                    <strong>Purchase access</strong> to download and view all {{ total_pages }} pages.
+                                {% endif %}
+                            </span>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="text-center py-4">
+                        <div class="revision-empty-icon mx-auto mb-3">
+                            <i class="bi {% if file_type == 'IMAGE' or file_type in '.png.jpg.jpeg.gif.bmp' %}bi-image{% else %}bi-exclamation-triangle{% endif %}"></i>
+                        </div>
+                        <h6 class="fw-bold text-muted mb-1">Preview Unavailable</h6>
+                        <p class="text-muted small mb-0" style="max-width: 400px; margin: 0 auto;">{{ preview_text|default:"A text preview could not be generated for this file." }}</p>
+                    </div>
+                    <div class="alert mt-3 mb-0 d-flex align-items-center" style="background: var(--primary-light); color: var(--primary-dark); border: none; border-radius: var(--radius-sm);">
+                        <i class="bi bi-download me-2"></i>
+                        <span>
+                            {% if material.is_free %}
+                                <strong>Download the file</strong> to view its full contents.
+                            {% else %}
+                                <strong>Purchase access</strong> to download and view this file.
+                            {% endif %}
+                        </span>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        <div class="revision-section">
+            <h6 class="fw-bold mb-3" style="color: var(--dark);"><i class="bi bi-info-circle" style="color: var(--primary);"></i> Quick Info</h6>
+            <div class="d-flex flex-column gap-2">
+                <div class="d-flex justify-content-between pb-2" style="border-bottom: 1px solid var(--gray-100);">
+                    <small class="text-muted">Subject</small>
+                    <small class="fw-medium">{{ material.subject.name }}</small>
+                </div>
+                <div class="d-flex justify-content-between pb-2" style="border-bottom: 1px solid var(--gray-100);">
+                    <small class="text-muted">Type</small>
+                    <span class="revision-badge type">{{ material.get_material_type_display }}</span>
+                </div>
+                <div class="d-flex justify-content-between pb-2" style="border-bottom: 1px solid var(--gray-100);">
+                    <small class="text-muted">Pages</small>
+                    <small class="fw-medium">{{ total_pages }}</small>
+                </div>
+                <div class="d-flex justify-content-between pb-2" style="border-bottom: 1px solid var(--gray-100);">
+                    <small class="text-muted">Downloads</small>
+                    <small class="fw-medium"><i class="bi bi-download"></i> {{ material.download_count }}</small>
+                </div>
+                <div class="d-flex justify-content-between">
+                    <small class="text-muted">Price</small>
+                    {% if material.is_free %}
+                        <span class="revision-badge free"><i class="bi bi-unlock"></i> Free</span>
+                    {% else %}
+                        <span class="revision-badge paid">KSH {{ material.price }}</span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="revision-section">
+            <h6 class="fw-bold mb-3" style="color: var(--dark);"><i class="bi bi-lightning" style="color: var(--accent);"></i> Actions</h6>
+            <a href="{% url 'material_detail' material.id %}" class="revision-btn revision-btn-secondary w-100 mb-2" style="justify-content: center;">
+                <i class="bi bi-arrow-left"></i> Back to Details
+            </a>
+            {% if material.is_free %}
+            <a href="{% url 'download_material' material.id %}" class="revision-btn revision-btn-success w-100" style="justify-content: center; border: none;">
+                <i class="bi bi-download"></i> Download Free
+            </a>
+            {% else %}
+            <a href="{% url 'material_detail' material.id %}#payment" class="revision-btn w-100 mb-2" style="justify-content: center; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff; border: none;">
+                <i class="bi bi-lock"></i> Purchase (KSH {{ material.price }})
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile - Document Converter{% endblock %}
+
+{% block content %}
+<div class="row animate-fade-in">
+    <div class="col-lg-8 mx-auto">
+        <!-- Profile Header Card -->
+        {% if school_profile %}
+        <!-- School Profile Header -->
+        <div class="card border-0 mb-4" style="border-radius: 20px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.15); background: linear-gradient(135deg, #f0fdf4, #dcfce7);">
+            <div class="card-body p-5">
+                <div class="d-flex align-items-center gap-4">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);">
+                        <i class="bi bi-building-fill text-white" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="fw-bold mb-1" style="color: #0f172a;">{{ school_profile.school_name }}</h3>
+                        <p class="text-muted mb-2">{{ user.email|default:"No email provided" }}</p>
+                        <div>
+                            <span class="badge" style="background: #10b981; color: white; padding: 0.5rem 1rem; border-radius: 8px;">
+                                <i class="bi bi-building"></i> School Account
+                            </span>
+                            {% if school_profile.has_active_subscription %}
+                                <span class="badge ms-2" style="background: #d1fae5; color: #065f46; padding: 0.5rem 1rem; border-radius: 8px;">
+                                    <i class="bi bi-check-circle"></i> Active Subscription
+                                </span>
+                            {% else %}
+                                <span class="badge ms-2" style="background: #fee2e2; color: #991b1b; padding: 0.5rem 1rem; border-radius: 8px;">
+                                    <i class="bi bi-exclamation-circle"></i> No Active Subscription
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- Regular User Profile Header -->
+        <div class="card border-0 mb-4" style="border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+            <div class="card-body p-5">
+                <div class="d-flex align-items-center gap-4">
+                    <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i class="bi bi-person-fill text-white" style="font-size: 2.5rem;"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h3 class="fw-bold mb-1" style="color: #0f172a;">{{ user.username }}</h3>
+                        <p class="text-muted mb-2">{{ user.email|default:"No email provided" }}</p>
+                        <div>
+                            {% if user.is_staff %}
+                                <span class="badge" style="background: #fef3c7; color: #92400e; padding: 0.5rem 1rem; border-radius: 8px;">
+                                    <i class="bi bi-shield-check"></i> Administrator
+                                </span>
+                            {% else %}
+                                <span class="badge" style="background: #d1fae5; color: #065f46; padding: 0.5rem 1rem; border-radius: 8px;">
+                                    <i class="bi bi-person"></i> Regular User
+                                </span>
+                            {% endif %}
+                            <a href="{% url 'edit_profile' %}" class="btn btn-sm ms-2" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 8px; padding: 0.5rem 1rem; font-weight: 500; border: none; font-size: 0.85rem;">
+                                <i class="bi bi-pencil"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Stats Cards -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(102, 126, 234, 0.1); background: linear-gradient(135deg, #667eea, #764ba2);">
+                    <div class="card-body p-4 text-white text-center">
+                        <div class="mb-2" style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="bi bi-file-earmark-text" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <div class="display-6 fw-bold mb-1">{{ total_conversions }}</div>
+                        <div style="opacity: 0.9; font-size: 0.85rem;">Total Conversions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(16, 185, 129, 0.1); background: linear-gradient(135deg, #10b981, #059669);">
+                    <div class="card-body p-4 text-white text-center">
+                        <div class="mb-2" style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="bi bi-check-circle" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <div class="display-6 fw-bold mb-1">{{ total_paid }}</div>
+                        <div style="opacity: 0.9; font-size: 0.85rem;">Paid Conversions</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0" style="border-radius: 16px; box-shadow: 0 4px 20px rgba(59, 130, 246, 0.1); background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                    <div class="card-body p-4 text-white text-center">
+                        <div class="mb-2" style="width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; margin: 0 auto;">
+                            <i class="bi bi-arrow-down-circle" style="font-size: 1.2rem;"></i>
+                        </div>
+                        <div class="display-6 fw-bold mb-1">{{ total_conversions|add:"0" }}</div>
+                        <div style="opacity: 0.9; font-size: 0.85rem;">Total Downloads</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Conversions -->
+        <div class="card border-0" style="border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.06);">
+            <div class="card-body p-4">
+                <div class="d-flex align-items-center gap-2 mb-4">
+                    <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                        <i class="bi bi-clock-history text-white"></i>
+                    </div>
+                    <h4 class="fw-bold mb-0" style="color: #0f172a;">Recent Conversions</h4>
+                </div>
+
+                {% if conversions %}
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr style="background: #f8fafc;">
+                                <th style="color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">File</th>
+                                <th style="color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Format</th>
+                                <th style="color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Pages</th>
+                                <th style="color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Cost</th>
+                                <th style="color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Status</th>
+                                <th style="color: #64748b; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 1rem;">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for conversion in conversions %}
+                            <tr style="border-bottom: 1px solid #f1f5f9;">
+                                <td style="padding: 1rem;">
+                                    <span class="fw-medium" style="color: #0f172a;">{{ conversion.original_pdf_filename|truncatechars:25 }}</span>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <span class="badge" style="background: #eef2ff; color: #667eea; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem;">
+                                        {{ conversion.get_output_format_display }}
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <span style="color: #64748b;">{{ conversion.page_count }}</span>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <span style="color: #64748b;">KSH {{ conversion.cost }}</span>
+                                </td>
+                                <td style="padding: 1rem;">
+                                    {% if conversion.payment_status == 'paid' %}
+                                        <span class="badge" style="background: #d1fae5; color: #065f46; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem;">
+                                            <i class="bi bi-check-circle"></i> Paid
+                                        </span>
+                                    {% elif conversion.payment_status == 'pending' %}
+                                        <span class="badge" style="background: #fef3c7; color: #92400e; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem;">
+                                            <i class="bi bi-clock"></i> Pending
+                                        </span>
+                                    {% else %}
+                                        <span class="badge" style="background: #fee2e2; color: #991b1b; padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.8rem;">
+                                            <i class="bi bi-x-circle"></i> Failed
+                                        </span>
+                                    {% endif %}
+                                </td>
+                                <td style="padding: 1rem;">
+                                    <span style="color: #64748b; font-size: 0.9rem;">{{ conversion.created_at|date:"M d, Y" }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-center py-5">
+                    <div style="width: 64px; height: 64px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="bi bi-file-earmark" style="font-size: 2rem; color: #94a3b8;"></i>
+                    </div>
+                    <h6 class="fw-bold mb-2" style="color: #64748b;">No Conversions Yet</h6>
+                    <p class="text-muted mb-3">Start converting documents to see them here</p>
+                    <a href="{% url 'index' %}" class="btn" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 10px; padding: 0.6rem 1.5rem; font-weight: 500; border: none;">
+                        <i class="bi bi-upload"></i> Convert a File
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Links -->
+        <div class="row g-3 mt-4">
+            <div class="col-md-4">
+                <a href="{% url 'edit_profile' %}" class="card border-0 h-100 text-decoration-none" 
+                   style="border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s;">
+                    <div class="card-body p-4 d-flex align-items-center gap-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-person-gear text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" style="color: #0f172a;">Edit Profile</div>
+                            <small class="text-muted">Update email, username, password</small>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'conversion_history' %}" class="card border-0 h-100 text-decoration-none" 
+                   style="border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s;">
+                    <div class="card-body p-4 d-flex align-items-center gap-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #10b981, #059669); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-clock-history text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" style="color: #0f172a;">View Full History</div>
+                            <small class="text-muted">See all your conversions</small>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="{% url 'index' %}" class="card border-0 h-100 text-decoration-none" 
+                   style="border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s;">
+                    <div class="card-body p-4 d-flex align-items-center gap-3">
+                        <div style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #d97706); border-radius: 12px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="bi bi-upload text-white"></i>
+                        </div>
+                        <div class="flex-grow-1">
+                            <div class="fw-bold" style="color: #0f172a;">New Conversion</div>
+                            <small class="text-muted">Upload and convert files</small>
+                        </div>
+                        <i class="bi bi-chevron-right text-muted"></i>
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enhanced Styles -->
+<style>
+tr:hover {
+    background: #f8fafc !important;
+}
+
+.card:hover {
+    transform: translateX(5px);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1) !important;
+}
+</style>
+{% endblock %}

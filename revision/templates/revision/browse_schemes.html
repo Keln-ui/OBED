@@ -1,0 +1,87 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Schemes of Work{% endblock %}
+
+{% block heading %}
+    <span><i class="bi bi-calendar-week" style="color: var(--primary);"></i> Schemes of Work</span>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'revision_home' %}" style="color: var(--primary); text-decoration: none;">Revision Home</a></li>
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">Schemes</li>
+{% endblock %}
+
+{% block content_body %}
+<div class="revision-toolbar animate-fade-in">
+    <div class="revision-toolbar-title">
+        <i class="bi bi-calendar-week" style="color: var(--primary);"></i> Schemes of Work
+    </div>
+    {% if user.is_authenticated and user.is_staff %}
+    <a href="/admin/revision/schemeofwork/add/" class="revision-btn revision-btn-success" style="border: none;">
+        <i class="bi bi-upload"></i> Upload New Scheme
+    </a>
+    {% endif %}
+</div>
+
+<!-- Filters -->
+<div class="revision-filter-bar animate-fade-in">
+    <form method="GET" class="d-flex align-items-end gap-2 flex-wrap flex-grow-1">
+        <select name="curriculum" class="form-select" onchange="this.form.submit()" style="border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);">
+            <option value="">All Curricula</option>
+            {% for value, label in curricula %}
+            <option value="{{ value }}" {% if selected_curriculum == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <select name="level" class="form-select" onchange="this.form.submit()" style="border-radius: var(--radius-sm); border: 1.5px solid var(--gray-200);">
+            <option value="">All Levels</option>
+            {% for value, label in levels %}
+            <option value="{{ value }}" {% if selected_level == value %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" class="revision-btn revision-btn-primary">
+            <i class="bi bi-funnel"></i> Filter
+        </button>
+        <a href="{% url 'browse_schemes' %}" class="revision-btn revision-btn-secondary">Clear</a>
+    </form>
+</div>
+
+<!-- Schemes List -->
+{% if schemes %}
+<div class="revision-card-grid animate-fade-in">
+    {% for scheme in schemes %}
+    <div class="revision-card">
+        <div class="revision-card-header">
+            <div class="revision-card-icon"><i class="bi bi-calendar-check"></i></div>
+            <div style="min-width: 0; flex: 1;">
+                <div class="revision-card-title">{{ scheme.subject.name }}</div>
+                <div class="revision-card-subtitle">{{ scheme.class_ref.name }} • {{ scheme.weeks_count }} weeks</div>
+            </div>
+        </div>
+
+        <div class="revision-card-body">
+            <div class="d-flex gap-2 flex-wrap">
+                <span class="revision-badge type">{{ scheme.get_term_display }}</span>
+                <span class="revision-badge cbe">{{ scheme.academic_year }}</span>
+            </div>
+            {% if scheme.description %}
+                <p class="mt-2 mb-0" style="font-size: 0.85rem; color: var(--gray-500);">{{ scheme.description|truncatechars:90 }}</p>
+            {% endif %}
+        </div>
+
+        <div class="revision-card-footer">
+            <span style="font-size: 0.82rem; color: var(--gray-500);"><i class="bi bi-download"></i> {{ scheme.download_count }} downloads</span>
+            <a href="{% url 'download_scheme' scheme.id %}" class="revision-btn revision-btn-primary">
+                <i class="bi bi-download"></i> Download
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="revision-empty animate-fade-in">
+    <div class="revision-empty-icon"><i class="bi bi-calendar-x"></i></div>
+    <h6>No Schemes of Work Found</h6>
+    <p>Check back later or upload a new scheme.</p>
+</div>
+{% endif %}
+{% endblock %}

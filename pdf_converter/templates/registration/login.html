@@ -1,0 +1,92 @@
+{% extends 'base.html' %}
+
+{% block title %}Login - Core Synch Solutions{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="text-center mb-4">
+            <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #667eea, #764ba2); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                <i class="bi bi-shield-lock-fill" style="font-size: 1.8rem; color: white;"></i>
+            </div>
+            <h4 class="fw-bold" style="color: #1e293b;">Sign In</h4>
+            <p class="text-muted">Access your account with email and password</p>
+        </div>
+
+        <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+            <div class="card-body p-4">
+                {% if form.errors %}
+                    <div class="alert alert-danger d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div>Invalid email or password. Please try again.</div>
+                    </div>
+                {% endif %}
+
+                {% if next %}
+                    {% if user.is_authenticated %}
+                    <div class="alert alert-warning d-flex align-items-center" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <div>Your account doesn't have staff access. Please login with admin credentials.</div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info d-flex align-items-center" role="alert">
+                        <i class="bi bi-info-circle-fill me-2"></i>
+                        <div>Please login with your email and password to continue.</div>
+                    </div>
+                    {% endif %}
+                {% endif %}
+
+                <form method="post" action="{% url 'login' %}">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_email" class="form-label fw-medium" style="color: #1e293b;">
+                            <i class="bi bi-envelope-fill text-muted me-1"></i> Email Address
+                        </label>
+                        <input type="email" name="email" class="form-control form-control-lg" 
+                               id="id_email" required autofocus
+                               style="border-radius: 10px; border: 1px solid #e2e8f0; padding: 0.75rem 1rem;"
+                               placeholder="Enter your email address">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="id_password" class="form-label fw-medium" style="color: #1e293b;">
+                            <i class="bi bi-lock-fill text-muted me-1"></i> Password
+                        </label>
+                        <input type="password" name="password" class="form-control form-control-lg" 
+                               id="id_password" required
+                               style="border-radius: 10px; border: 1px solid #e2e8f0; padding: 0.75rem 1rem;"
+                               placeholder="Enter your password">
+                    </div>
+
+                    <input type="hidden" name="next" value="{{ next }}">
+
+                    <button type="submit" class="btn btn-lg w-100 mt-2" 
+                            style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; padding: 0.75rem; font-weight: 600; color: white;">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
+                    </button>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{% url 'password_reset' %}" class="text-decoration-none" style="color: #667eea; font-size: 0.9rem;">
+                            <i class="bi bi-key"></i> Forgot Password?
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="text-center mt-3">
+            <small class="text-muted">
+                <i class="bi bi-shield-check"></i> 
+                Secure login with email authentication
+            </small>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/" class="text-decoration-none" style="color: #667eea;">
+                <i class="bi bi-arrow-left"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

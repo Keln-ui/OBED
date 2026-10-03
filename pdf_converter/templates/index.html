@@ -1,0 +1,900 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CoreSynch - Document Converter & Academic Platform{% endblock %}
+
+{% block content %}
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-orb hero-orb-1"></div>
+  <div class="hero-orb hero-orb-2"></div>
+  <div class="container position-relative">
+    <div class="row align-items-center g-5">
+      <div class="col-lg-7 animate-fade-in">
+        <div class="hero-badge">
+          <i class="bi bi-lightning-fill"></i>
+          <span>All-in-One Document Platform</span>
+        </div>
+        <h1 class="hero-title">
+          Convert, Revise & <br><span class="highlight">Excel Academically</span>
+        </h1>
+        <p class="hero-subtitle">
+          Transform PDFs and images into editable documents. Access revision notes, past papers,
+          and generate schemes of work — all in one powerful platform.
+        </p>
+        <div class="hero-actions">
+          <a href="#converter" class="btn-hero-primary">
+            <i class="bi bi-upload"></i> Start Converting
+          </a>
+          <a href="{% url 'revision_home' %}" class="btn-hero-secondary">
+            <i class="bi bi-book"></i> Revision Materials
+          </a>
+          <a href="{% url 'sow_generator' %}" class="btn-hero-secondary">
+            <i class="bi bi-calendar-week"></i> Scheme of Work
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-value">10+</span>
+            <span class="hero-stat-label">Formats Supported</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">Free</span>
+            <span class="hero-stat-label">Basic Tools</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">14</span>
+            <span class="hero-stat-label">PDF Tools</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-5 d-none d-lg-block animate-fade-in">
+        <div class="hero-panel">
+          <div class="hero-panel-item">
+            <div class="hero-panel-icon purple"><i class="bi bi-file-earmark-pdf"></i></div>
+            <div class="hero-panel-info">
+              <div class="title">PDF → Word</div>
+              <div class="subtitle">Just uploaded</div>
+            </div>
+            <span class="hero-panel-status done"><i class="bi bi-check-circle-fill"></i> Done</span>
+          </div>
+          <div class="hero-panel-item">
+            <div class="hero-panel-icon green"><i class="bi bi-file-earmark-image"></i></div>
+            <div class="hero-panel-info">
+              <div class="title">Image → PDF</div>
+              <div class="subtitle">Free conversion</div>
+            </div>
+            <span class="hero-panel-status free"><i class="bi bi-star-fill"></i> Free</span>
+          </div>
+          <div class="hero-panel-item">
+            <div class="hero-panel-icon amber"><i class="bi bi-book"></i></div>
+            <div class="hero-panel-info">
+              <div class="title">Revision Notes</div>
+              <div class="subtitle">CBC & 8-4-4 Curriculum</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FEATURES
+     ============================================================ -->
+<section class="section">
+  <div class="container">
+    <div class="section-header animate-fade-in">
+      <div class="section-label">
+        <i class="bi bi-grid-3x3-gap-fill"></i>
+        <span>Platform Features</span>
+      </div>
+      <h2 class="section-title">Everything you need in one place</h2>
+      <p class="section-subtitle">
+        From document conversion to academic revision tools — CoreSynch powers your productivity.
+      </p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card animate-fade-in">
+        <div class="feature-icon purple"><i class="bi bi-arrow-repeat"></i></div>
+        <h5>Document Converter</h5>
+        <p>Convert PDFs and images to Word, PPTX, HTML, TXT, JSON, CSV, and more. OCR support for scanned documents.</p>
+        <a href="#converter" class="feature-link">Try it now <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="feature-card animate-fade-in">
+        <div class="feature-icon green"><i class="bi bi-filetype-pdf"></i></div>
+        <h5>Word & Image to PDF</h5>
+        <p>Instantly convert Word documents and images to PDF format — completely free with no payment required.</p>
+        <a href="#free-tools" class="feature-link">Convert free <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="feature-card animate-fade-in">
+        <div class="feature-icon amber"><i class="bi bi-tools"></i></div>
+        <h5>PDF Tools Suite</h5>
+        <p>Merge, split, compress, rotate, crop, watermark, unlock, protect, organize, and extract pages from PDFs.</p>
+        <a href="#pdf-tools" class="feature-link">Explore tools <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="feature-card animate-fade-in">
+        <div class="feature-icon blue"><i class="bi bi-book"></i></div>
+        <h5>Revision Materials</h5>
+        <p>Access comprehensive revision notes, past papers, and study materials for CBC and 8-4-4 curricula.</p>
+        <a href="{% url 'revision_home' %}" class="feature-link">Browse library <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="feature-card animate-fade-in">
+        <div class="feature-icon rose"><i class="bi bi-calendar-week"></i></div>
+        <h5>Scheme of Work Generator</h5>
+        <p>Generate lesson schemes for your class. Enter class, subject, topics, and download instantly.</p>
+        <a href="{% url 'sow_generator' %}" class="feature-link">Generate <i class="bi bi-arrow-right"></i></a>
+      </div>
+      <div class="feature-card animate-fade-in">
+        <div class="feature-icon cyan"><i class="bi bi-shield-check"></i></div>
+        <h5>Secure & Private</h5>
+        <p>Your files are processed securely and automatically deleted after conversion. Your privacy matters.</p>
+        <a href="#" class="feature-link">Learn more <i class="bi bi-arrow-right"></i></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     MAIN CONVERTER
+     ============================================================ -->
+<section id="converter" class="section pt-0">
+  <div class="container">
+    <div class="section-header animate-fade-in">
+      <div class="section-label">
+        <i class="bi bi-arrow-repeat"></i>
+        <span>Converter</span>
+      </div>
+      <h2 class="section-title">Document Converter</h2>
+      <p class="section-subtitle">Upload a PDF or image to get started</p>
+    </div>
+    <div class="converter-card animate-fade-in">
+      <div class="converter-card-header">
+        <h3><i class="bi bi-arrow-repeat"></i> Document Converter</h3>
+        <span class="text-muted" style="font-size:0.85rem;">Upload a PDF or image to get started</span>
+      </div>
+      <div class="converter-card-body">
+        <div class="row g-4">
+          <div class="col-lg-7">
+            <!-- Upload Area -->
+            <div class="upload-zone" id="uploadArea">
+              <div class="upload-zone-icon"><i class="bi bi-cloud-arrow-up"></i></div>
+              <h5>Drop file to upload</h5>
+              <p>or click to browse &middot; PDF, PNG, JPG, GIF, BMP</p>
+              <input type="file" id="pdfFile" accept=".pdf,.png,.jpg,.jpeg,.bmp,.gif" style="display:none;">
+              {% csrf_token %}
+              <button type="button" class="btn btn-primary btn-sm" id="chooseFileBtn">
+                <i class="bi bi-folder2-open me-1"></i> Choose File
+              </button>
+            </div>
+
+            <!-- File Info -->
+            <div id="fileInfo" class="mt-3" style="display:none;">
+              <div class="file-card">
+                <div class="file-card-header">
+                  <div class="file-icon"><i class="bi bi-file-earmark-check"></i></div>
+                  <div class="flex-grow-1">
+                    <div class="fw-bold" id="fileName" style="color:var(--dark);font-size:0.9rem;"></div>
+                    <small class="text-muted" id="fileSize"></small>
+                  </div>
+                  <button class="btn btn-sm btn-outline-secondary" onclick="clearFile()" style="border-radius:8px;">
+                    <i class="bi bi-x"></i>
+                  </button>
+                </div>
+                <div class="d-flex justify-content-between align-items-center px-3 py-2 rounded-2 mb-2" style="background:#fff;border:1px solid var(--gray-200);font-size:0.85rem;">
+                  <span><i class="bi bi-info-circle text-primary me-1"></i>KSH 2/page</span>
+                  <span><span id="estimatedPages">-</span> pages &middot; <strong class="text-primary">KSH <span id="estimatedCost">-</span></strong></span>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label fw-medium mb-1" style="color:var(--dark);font-size:0.85rem;">Output Format</label>
+                  <select class="form-select" id="outputFormat" style="font-size:0.9rem;">
+                    <option value="docx">Word Document (.docx)</option>
+                    <option value="doc">Word 97-2003 (.doc)</option>
+                    <option value="txt">Text File (.txt)</option>
+                    <option value="html">HTML Document (.html)</option>
+                    <option value="json">JSON Data (.json)</option>
+                    <option value="csv">CSV Spreadsheet (.csv)</option>
+                    <option value="pptx">PowerPoint (.pptx)</option>
+                  </select>
+                </div>
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="useOcr">
+                  <label class="form-check-label" for="useOcr" style="cursor:pointer;color:var(--gray-500);font-size:0.85rem;">
+                    Use OCR <span class="text-muted">(scanned documents)</span>
+                  </label>
+                </div>
+                <button class="btn btn-primary w-100 py-2" id="convertBtn" onclick="convertPdf()" style="font-size:0.95rem;">
+                  <i class="bi bi-arrow-repeat me-1"></i> Convert Now
+                </button>
+              </div>
+            </div>
+
+            <!-- Progress -->
+            <div id="progressContainer" class="mt-3" style="display:none;">
+              <div class="progress">
+                <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;"></div>
+              </div>
+              <p class="text-center text-muted mt-2 mb-0" style="font-size:0.85rem;">
+                <i class="bi bi-hourglass-split me-1"></i>Converting…
+              </p>
+            </div>
+
+            <!-- Result -->
+            <div id="resultContainer" class="mt-3" style="display:none;">
+              <div class="result-card">
+                <div class="result-icon"><i class="bi bi-check-lg"></i></div>
+                <h5 class="fw-bold text-success mb-2" style="font-size:1.1rem;">Conversion Complete!</h5>
+                <p class="text-muted mb-3" style="font-size:0.9rem;">
+                  Pages: <strong id="resultPages">-</strong> &middot; Cost: <strong style="color:var(--primary);">KSH <span id="resultCost">-</span></strong>
+                </p>
+                <a id="downloadBtn" href="#" download class="btn btn-success w-100" style="font-weight:600;">
+                  <i class="bi bi-download me-1"></i> Download
+                </a>
+              </div>
+            </div>
+
+            <!-- Error -->
+            <div id="errorContainer" class="mt-3" style="display:none;">
+              <div class="alert alert-danger d-flex align-items-center">
+                <i class="bi bi-exclamation-triangle-fill me-2" style="font-size:1.1rem;"></i>
+                <div><strong>Oops!</strong> <span id="errorMessage" style="font-size:0.85rem;"></span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-5">
+            <div class="p-3" style="background:var(--gray-50);border-radius:var(--radius-md);height:100%;">
+              <h6 class="fw-bold mb-3" style="color:var(--dark);font-size:0.95rem;">Supported Output Formats</h6>
+              <div class="format-badges justify-content-start mb-3">
+                <span class="format-badge"><i class="bi bi-filetype-docx text-primary"></i> DOCX</span>
+                <span class="format-badge"><i class="bi bi-filetype-doc text-primary"></i> DOC</span>
+                <span class="format-badge"><i class="bi bi-filetype-html text-warning"></i> HTML</span>
+                <span class="format-badge"><i class="bi bi-filetype-json text-success"></i> JSON</span>
+                <span class="format-badge"><i class="bi bi-filetype-csv text-info"></i> CSV</span>
+                <span class="format-badge"><i class="bi bi-filetype-pptx text-danger"></i> PPTX</span>
+                <span class="format-badge"><i class="bi bi-filetype-txt text-secondary"></i> TXT</span>
+              </div>
+              <div class="mt-3 p-3" style="background:#fff;border-radius:var(--radius-sm);border-left:3px solid var(--primary);">
+                <small class="text-muted d-block mb-1" style="font-size:0.8rem;">💡 Tip</small>
+                <small style="color:var(--gray-500);font-size:0.8rem;">Use OCR for scanned PDFs and images to extract text accurately.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FREE TOOLS
+     ============================================================ -->
+<section id="free-tools" class="section pt-0">
+  <div class="container">
+    <div class="section-header animate-fade-in">
+      <div class="section-label">
+        <i class="bi bi-unlock"></i>
+        <span>Free Tools</span>
+      </div>
+      <h2 class="section-title">Free Conversion Tools</h2>
+      <p class="section-subtitle">No payment required — instant downloads</p>
+    </div>
+    <div class="row g-4">
+      <!-- Free Word → PDF -->
+      <div class="col-lg-6">
+        <div class="free-tool-card animate-fade-in" style="background:linear-gradient(135deg,#059669,#047857);">
+          <div class="card-body">
+            <div class="free-tool-badge"><i class="bi bi-unlock"></i> Free</div>
+            <h3>Word to PDF Converter</h3>
+            <p>Convert Word documents (.docx) to PDF instantly — no payment required.</p>
+            <div class="card border-0" style="background:rgba(255,255,255,0.12);border-radius:var(--radius-md);">
+              <div class="card-body p-3">
+                <div class="upload-zone" id="docxUploadArea" style="border:2px dashed rgba(255,255,255,0.25);background:rgba(255,255,255,0.06);">
+                  <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.3rem;color:#fff;">
+                    <i class="bi bi-file-earmark-word-fill"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1" style="color:#fff;font-size:0.9rem;">Drop Word file here</h6>
+                  <p style="color:rgba(255,255,255,0.7);font-size:0.75rem;">.docx only</p>
+                  <input type="file" id="docxFile" accept=".docx" style="display:none;">
+                  <button type="button" class="btn btn-sm" id="chooseDocxBtn" style="background:#fff;color:#059669;border-radius:6px;font-weight:600;border:none;font-size:0.85rem;">
+                    <i class="bi bi-folder2-open me-1"></i> Choose File
+                  </button>
+                </div>
+
+                <div id="docxFileInfo" class="mt-2" style="display:none;">
+                  <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:0.75rem;">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="bi bi-file-earmark-check text-white me-2"></i>
+                      <div class="fw-medium text-white" id="docxFileName" style="font-size:0.8rem;"></div>
+                    </div>
+                    <button class="btn btn-light btn-sm w-100" id="convertDocxBtn" onclick="convertDocxToPdf()" style="border-radius:6px;font-weight:600;font-size:0.85rem;">
+                      <i class="bi bi-arrow-repeat me-1"></i> Convert to PDF
+                    </button>
+                  </div>
+                </div>
+
+                <div id="docxProgressContainer" class="mt-2" style="display:none;">
+                  <div class="progress" style="height:4px;background:rgba(255,255,255,0.2);">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;background:#fff;border-radius:100px;"></div>
+                  </div>
+                  <p class="text-center mt-1 mb-0 text-white" style="font-size:0.75rem;"><i class="bi bi-hourglass-split me-1"></i>Converting…</p>
+                </div>
+
+                <div id="docxResultContainer" class="mt-2" style="display:none;">
+                  <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:0.75rem;text-align:center;">
+                    <i class="bi bi-check-circle-fill text-white mb-1" style="font-size:1.5rem;"></i>
+                    <p class="text-white mb-2" style="font-size:0.85rem;">Ready to download!</p>
+                    <a id="docxDownloadBtn" href="#" class="btn btn-light btn-sm w-100" style="border-radius:6px;font-weight:600;font-size:0.85rem;" download>
+                      <i class="bi bi-download me-1"></i> Download PDF
+                    </a>
+                  </div>
+                </div>
+
+                <div id="docxErrorContainer" class="mt-2" style="display:none;">
+                  <div class="alert" style="background:rgba(255,255,255,0.15);border:none;border-radius:6px;padding:0.5rem;">
+                    <small id="docxErrorMessage" class="text-white" style="font-size:0.8rem;"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Free Image → PDF -->
+      <div class="col-lg-6">
+        <div class="free-tool-card animate-fade-in" style="background:linear-gradient(135deg,#2563eb,#1d4ed8);">
+          <div class="card-body">
+            <div class="free-tool-badge"><i class="bi bi-unlock"></i> Free</div>
+            <h3>Image to PDF Converter</h3>
+            <p>Convert images (PNG, JPG, BMP, GIF) to PDF instantly — no payment required.</p>
+            <div class="card border-0" style="background:rgba(255,255,255,0.12);border-radius:var(--radius-md);">
+              <div class="card-body p-3">
+                <div class="upload-zone" id="imageUploadArea" style="border:2px dashed rgba(255,255,255,0.25);background:rgba(255,255,255,0.06);">
+                  <div style="width:48px;height:48px;background:rgba(255,255,255,0.15);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 0.75rem;font-size:1.3rem;color:#fff;">
+                    <i class="bi bi-file-earmark-image-fill"></i>
+                  </div>
+                  <h6 class="fw-bold mb-1" style="color:#fff;font-size:0.9rem;">Drop image file here</h6>
+                  <p style="color:rgba(255,255,255,0.7);font-size:0.75rem;">PNG, JPG, BMP, GIF</p>
+                  <input type="file" id="imageFile" accept=".png,.jpg,.jpeg,.bmp,.gif,.tiff,.webp" style="display:none;">
+                  <button type="button" class="btn btn-sm" id="chooseImageBtn" style="background:#fff;color:#2563eb;border-radius:6px;font-weight:600;border:none;font-size:0.85rem;">
+                    <i class="bi bi-folder2-open me-1"></i> Choose File
+                  </button>
+                </div>
+
+                <div id="imageFileInfo" class="mt-2" style="display:none;">
+                  <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:0.75rem;">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="bi bi-file-earmark-check text-white me-2"></i>
+                      <div class="fw-medium text-white" id="imageFileName" style="font-size:0.8rem;"></div>
+                    </div>
+                    <button class="btn btn-light btn-sm w-100" id="convertImageBtn" onclick="convertImageToPdf()" style="border-radius:6px;font-weight:600;font-size:0.85rem;">
+                      <i class="bi bi-arrow-repeat me-1"></i> Convert to PDF
+                    </button>
+                  </div>
+                </div>
+
+                <div id="imageProgressContainer" class="mt-2" style="display:none;">
+                  <div class="progress" style="height:4px;background:rgba(255,255,255,0.2);">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width:100%;background:#fff;border-radius:100px;"></div>
+                  </div>
+                  <p class="text-center mt-1 mb-0 text-white" style="font-size:0.75rem;"><i class="bi bi-hourglass-split me-1"></i>Converting…</p>
+                </div>
+
+                <div id="imageResultContainer" class="mt-2" style="display:none;">
+                  <div style="background:rgba(255,255,255,0.1);border-radius:8px;padding:0.75rem;text-align:center;">
+                    <i class="bi bi-check-circle-fill text-white mb-1" style="font-size:1.5rem;"></i>
+                    <p class="text-white mb-2" style="font-size:0.85rem;">Ready to download!</p>
+                    <a id="imageDownloadBtn" href="#" class="btn btn-light btn-sm w-100" style="border-radius:6px;font-weight:600;font-size:0.85rem;" download>
+                      <i class="bi bi-download me-1"></i> Download PDF
+                    </a>
+                  </div>
+                </div>
+
+                <div id="imageErrorContainer" class="mt-2" style="display:none;">
+                  <div class="alert" style="background:rgba(255,255,255,0.15);border:none;border-radius:6px;padding:0.5rem;">
+                    <small id="imageErrorMessage" class="text-white" style="font-size:0.8rem;"></small>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     PDF TOOLS SUITE
+     ============================================================ -->
+<section id="pdf-tools" class="section pt-0">
+  <div class="container">
+    <div class="section-header animate-fade-in">
+      <div class="section-label">
+        <i class="bi bi-tools"></i>
+        <span>PDF Utilities</span>
+      </div>
+      <h2 class="section-title">PDF Tools Suite</h2>
+      <p class="section-subtitle">Merge, split, compress, rotate, watermark, unlock, protect, crop, organize, extract images, remove pages, and extract pages from PDFs.</p>
+    </div>
+    <div class="pdf-tools-card animate-fade-in">
+      <div class="card-body">
+        <form id="pdfToolForm" class="row g-3">
+          {% csrf_token %}
+          <div class="col-lg-4">
+            <label class="form-label">Tool</label>
+            <select class="form-select" id="pdfToolSelect" name="tool">
+              <option value="merge">Merge PDFs</option>
+              <option value="split">Split PDF</option>
+              <option value="compress">Compress PDF</option>
+              <option value="rotate">Rotate PDF</option>
+              <option value="watermark">Add Watermark</option>
+              <option value="flatten">Flatten PDF</option>
+              <option value="resize">Resize PDF</option>
+              <option value="unlock">Unlock PDF</option>
+              <option value="protect">Protect PDF</option>
+              <option value="crop">Crop PDF</option>
+              <option value="organize">Organize PDF</option>
+              <option value="extract_image">Extract Image from PDF</option>
+              <option value="page_remover">PDF Page Remover</option>
+              <option value="extract_pages">Extract Pages</option>
+            </select>
+          </div>
+          <div class="col-lg-5">
+            <label class="form-label">PDF File(s)</label>
+            <input type="file" class="form-control" id="pdfToolFiles" name="pdf_files" accept=".pdf" multiple>
+            <div id="pdfToolFilesList" class="mt-2"></div>
+            <small id="pdfToolFilesHint" class="text-muted d-block mt-1">Select one or more PDF files. Hold Ctrl (or Cmd) to select multiple files.</small>
+          </div>
+          <div class="col-lg-3">
+            <label class="form-label">Extra option</label>
+            <input type="text" class="form-control" id="pageRangeInput" name="page_range" placeholder="e.g. 1-3,5" style="display:none;">
+            <select class="form-select" id="rotationInput" name="rotation" style="display:none;">
+              <option value="90">Rotate 90°</option>
+              <option value="180">Rotate 180°</option>
+              <option value="270">Rotate 270°</option>
+            </select>
+            <input type="text" class="form-control" id="watermarkInput" name="watermark_text" placeholder="Watermark text" style="display:none;">
+            <input type="password" class="form-control" id="passwordInput" name="password" placeholder="Password (min 4 chars)" style="display:none;">
+            <input type="number" class="form-control" id="scaleInput" name="scale" placeholder="Scale % (e.g. 50)" style="display:none;" min="1" max="200">
+            <input type="text" class="form-control" id="cropBoxInput" name="crop_box" placeholder="left,bottom,right,top" style="display:none;">
+          </div>
+          <div class="col-12">
+            <button type="submit" class="btn btn-primary px-4" id="pdfToolBtn">
+              <i class="bi bi-tools me-1"></i> Run Tool
+            </button>
+            <span class="text-muted ms-2" id="pdfToolHint">Upload at least two PDFs for merge.</span>
+          </div>
+        </form>
+        <div id="pdfToolStatus" class="mt-3" style="display:none;"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCHEME OF WORK
+     ============================================================ -->
+<section class="section pt-0">
+  <div class="container">
+    <div class="free-tool-card animate-fade-in" style="background:linear-gradient(135deg,#7c3aed,#6d28d9);">
+      <div class="card-body">
+        <div class="row align-items-center">
+          <div class="col-lg-8 mb-3 mb-lg-0">
+            <div class="free-tool-badge"><i class="bi bi-mortarboard"></i> Teacher Tool</div>
+            <h3>Scheme of Work Generator</h3>
+            <p>Generate lesson schemes for your class. Enter class, subject, topics, and download instantly as a formatted document.</p>
+          </div>
+          <div class="col-lg-4">
+            <div class="card border-0" style="background:rgba(255,255,255,0.12);border-radius:var(--radius-md);">
+              <div class="card-body p-3 text-center">
+                <a href="{% url 'sow_generator' %}" class="btn btn-light w-100" style="border-radius:8px;font-weight:600;font-size:0.9rem;color:#7c3aed;">
+                  <i class="bi bi-file-earmark-plus me-1"></i> Generate Scheme
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA
+     ============================================================ -->
+<section class="section pt-0">
+  <div class="container">
+    <div class="cta-section animate-fade-in">
+      <h2>Ready to get started?</h2>
+      <p>Create an account to access premium features, save your conversion history, and unlock the full revision library.</p>
+      <div class="d-flex flex-wrap justify-content-center gap-3">
+        <a href="{% url 'user_register' %}" class="btn-hero-primary">
+          <i class="bi bi-person-plus"></i> Create Free Account
+        </a>
+        <a href="{% url 'login' %}" class="btn-hero-secondary">
+          <i class="bi bi-box-arrow-in-right"></i> Sign In
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<style>
+  .hero-stat-divider { width:1px; background:rgba(255,255,255,0.1); }
+  .upload-zone { transition:all 0.3s cubic-bezier(0.4,0,0.2,1); }
+  .upload-zone.dragover { border-color:var(--primary); background:var(--primary-light); border-style:solid; transform:scale(1.01); }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const uploadArea = document.getElementById('uploadArea');
+const pdfFile = document.getElementById('pdfFile');
+const fileInfo = document.getElementById('fileInfo');
+const fileName = document.getElementById('fileName');
+const fileSize = document.getElementById('fileSize');
+const outputFormat = document.getElementById('outputFormat');
+const progressContainer = document.getElementById('progressContainer');
+const resultContainer = document.getElementById('resultContainer');
+const errorContainer = document.getElementById('errorContainer');
+const errorMessage = document.getElementById('errorMessage');
+const convertBtn = document.getElementById('convertBtn');
+
+const formatNames = {
+    'docx': 'Word Document', 'doc': 'Word 97-2003', 'txt': 'Text File',
+    'html': 'HTML Document', 'json': 'JSON Data', 'csv': 'CSV Spreadsheet',
+    'pptx': 'PowerPoint Presentation'
+};
+
+uploadArea.addEventListener('click', () => pdfFile.click());
+document.getElementById('chooseFileBtn').addEventListener('click', (e) => { e.stopPropagation(); pdfFile.click(); });
+
+uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+uploadArea.addEventListener('drop', (e) => {
+    e.preventDefault(); uploadArea.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && /(\.pdf|\.png|\.jpg|\.jpeg|\.bmp|\.gif)$/i.test(file.name)) handleFile(file);
+    else showError('Please select a PDF or Image file');
+});
+pdfFile.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
+
+function handleFile(file) {
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = formatFileSize(file.size);
+    fileInfo.style.display = 'block';
+    resultContainer.style.display = 'none';
+    errorContainer.style.display = 'none';
+    const pages = Math.max(1, Math.ceil(file.size / (50 * 1024)));
+    document.getElementById('estimatedPages').textContent = pages;
+    document.getElementById('estimatedCost').textContent = (pages * 2).toFixed(2);
+}
+
+function clearFile() {
+    pdfFile.value = '';
+    fileInfo.style.display = 'none';
+    resultContainer.style.display = 'none';
+    errorContainer.style.display = 'none';
+}
+
+function formatFileSize(bytes) {
+    if (!bytes) return '0 Bytes';
+    const k = 1024, sizes = ['Bytes','KB','MB','GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return (bytes / Math.pow(k, i)).toFixed(1) + ' ' + sizes[i];
+}
+
+async function convertPdf() {
+    const file = pdfFile.files[0];
+    if (!file) return showError('Please select a file');
+
+    const fmt = outputFormat.value, name = formatNames[fmt] || 'Document';
+    const fd = new FormData();
+    fd.append('pdf_file', file);
+    fd.append('use_ocr', document.getElementById('useOcr').checked);
+    fd.append('output_format', fmt);
+    fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    convertBtn.disabled = true;
+    convertBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Converting…';
+    progressContainer.style.display = 'block';
+    resultContainer.style.display = 'none';
+    errorContainer.style.display = 'none';
+
+    try {
+        const r = await fetch('/upload/', { method: 'POST', body: fd });
+        const d = await r.json();
+        console.log('Response:', d);
+        if (r.ok && d.success) {
+            document.getElementById('downloadBtn').href = d.download_url;
+            document.getElementById('downloadBtn').download = d.filename;
+            document.getElementById('downloadBtn').textContent = 'Download ' + name;
+            resultContainer.style.display = 'block';
+        } else {
+            showError(d.error || 'Conversion failed');
+        }
+    } catch (e) { 
+        console.error('Fetch error:', e);
+        showError(e.message || 'An error occurred'); 
+    }
+    finally {
+        convertBtn.disabled = false;
+        convertBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Convert Now';
+        progressContainer.style.display = 'none';
+    }
+}
+
+function showError(msg) {
+    document.getElementById('errorMessage').textContent = msg;
+    document.getElementById('errorContainer').style.display = 'block';
+}
+
+// =================== FREE WORD TO PDF CONVERTER ===================
+const docxUploadArea = document.getElementById('docxUploadArea');
+const docxFile = document.getElementById('docxFile');
+const docxFileInfo = document.getElementById('docxFileInfo');
+const docxProgressContainer = document.getElementById('docxProgressContainer');
+const docxResultContainer = document.getElementById('docxResultContainer');
+const docxErrorContainer = document.getElementById('docxErrorContainer');
+const docxErrorMessage = document.getElementById('docxErrorMessage');
+const convertDocxBtn = document.getElementById('convertDocxBtn');
+
+docxUploadArea.addEventListener('click', () => docxFile.click());
+document.getElementById('chooseDocxBtn').addEventListener('click', (e) => { e.stopPropagation(); docxFile.click(); });
+
+docxUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); docxUploadArea.classList.add('dragover'); });
+docxUploadArea.addEventListener('dragleave', () => { docxUploadArea.classList.remove('dragover'); });
+docxUploadArea.addEventListener('drop', (e) => {
+    e.preventDefault(); docxUploadArea.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.name.toLowerCase().endsWith('.docx')) handleDocxFile(file);
+    else showDocxError('Please select a .docx file');
+});
+docxFile.addEventListener('change', (e) => { if (e.target.files.length) handleDocxFile(e.target.files[0]); });
+
+function handleDocxFile(file) {
+    document.getElementById('docxFileName').textContent = file.name;
+    docxFileInfo.style.display = 'block';
+    docxResultContainer.style.display = 'none';
+    docxErrorContainer.style.display = 'none';
+}
+
+async function convertDocxToPdf() {
+    const file = docxFile.files[0];
+    if (!file) return showDocxError('Please select a Word file');
+
+    const fd = new FormData();
+    fd.append('docx_file', file);
+    fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    convertDocxBtn.disabled = true;
+    convertDocxBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Converting…';
+    docxProgressContainer.style.display = 'block';
+    docxResultContainer.style.display = 'none';
+    docxErrorContainer.style.display = 'none';
+
+    try {
+        const r = await fetch('/upload-docx-to-pdf/', { method: 'POST', body: fd });
+        const d = await r.json();
+        if (r.ok && d.success) {
+            const btn = document.getElementById('docxDownloadBtn');
+            btn.href = d.download_url;
+            btn.download = d.filename;
+            btn.textContent = 'Download ' + d.filename;
+            docxResultContainer.style.display = 'block';
+            setTimeout(() => { btn.click(); }, 500);
+        } else showDocxError(d.error || 'Conversion failed');
+    } catch (e) { showDocxError('An error occurred'); }
+    finally {
+        convertDocxBtn.disabled = false;
+        convertDocxBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Convert to PDF';
+        docxProgressContainer.style.display = 'none';
+    }
+}
+
+function showDocxError(msg) {
+    document.getElementById('docxErrorMessage').textContent = msg;
+    document.getElementById('docxErrorContainer').style.display = 'block';
+}
+
+// =================== FREE IMAGE TO PDF CONVERTER ===================
+const imageUploadArea = document.getElementById('imageUploadArea');
+const imageFile = document.getElementById('imageFile');
+const imageFileInfo = document.getElementById('imageFileInfo');
+const imageProgressContainer = document.getElementById('imageProgressContainer');
+const imageResultContainer = document.getElementById('imageResultContainer');
+const imageErrorContainer = document.getElementById('imageErrorContainer');
+const imageErrorMessage = document.getElementById('imageErrorMessage');
+const convertImageBtn = document.getElementById('convertImageBtn');
+
+imageUploadArea.addEventListener('click', () => imageFile.click());
+document.getElementById('chooseImageBtn').addEventListener('click', (e) => { e.stopPropagation(); imageFile.click(); });
+
+imageUploadArea.addEventListener('dragover', (e) => { e.preventDefault(); imageUploadArea.classList.add('dragover'); });
+imageUploadArea.addEventListener('dragleave', () => { imageUploadArea.classList.remove('dragover'); });
+imageUploadArea.addEventListener('drop', (e) => {
+    e.preventDefault(); imageUploadArea.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && /\.(png|jpg|jpeg|bmp|gif|tiff|webp)$/i.test(file.name)) handleImageFile(file);
+    else showImageError('Please select an image file (PNG, JPG, BMP, GIF)');
+});
+imageFile.addEventListener('change', (e) => { if (e.target.files.length) handleImageFile(e.target.files[0]); });
+
+function handleImageFile(file) {
+    document.getElementById('imageFileName').textContent = file.name;
+    imageFileInfo.style.display = 'block';
+    imageResultContainer.style.display = 'none';
+    imageErrorContainer.style.display = 'none';
+}
+
+async function convertImageToPdf() {
+    const file = imageFile.files[0];
+    if (!file) return showImageError('Please select an image file');
+
+    const fd = new FormData();
+    fd.append('image_file', file);
+    fd.append('csrfmiddlewaretoken', document.querySelector('[name=csrfmiddlewaretoken]').value);
+
+    convertImageBtn.disabled = true;
+    convertImageBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Converting…';
+    imageProgressContainer.style.display = 'block';
+    imageResultContainer.style.display = 'none';
+    imageErrorContainer.style.display = 'none';
+
+    try {
+        const r = await fetch('/upload-image-to-pdf/', { method: 'POST', body: fd });
+        const d = await r.json();
+        if (r.ok && d.success) {
+            const btn = document.getElementById('imageDownloadBtn');
+            btn.href = d.download_url;
+            btn.download = d.filename;
+            btn.textContent = 'Download ' + d.filename;
+            imageResultContainer.style.display = 'block';
+            setTimeout(() => { btn.click(); }, 500);
+        } else showImageError(d.error || 'Conversion failed');
+    } catch (e) { showImageError('An error occurred'); }
+    finally {
+        convertImageBtn.disabled = false;
+        convertImageBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Convert to PDF';
+        imageProgressContainer.style.display = 'none';
+    }
+}
+
+function showImageError(msg) {
+    document.getElementById('imageErrorMessage').textContent = msg;
+    document.getElementById('imageErrorContainer').style.display = 'block';
+}
+
+// =================== PDF TOOLS ===================
+const pdfToolForm = document.getElementById('pdfToolForm');
+const pdfToolSelect = document.getElementById('pdfToolSelect');
+const pdfToolFiles = document.getElementById('pdfToolFiles');
+const pageRangeInput = document.getElementById('pageRangeInput');
+const rotationInput = document.getElementById('rotationInput');
+const watermarkInput = document.getElementById('watermarkInput');
+const passwordInput = document.getElementById('passwordInput');
+const scaleInput = document.getElementById('scaleInput');
+const cropBoxInput = document.getElementById('cropBoxInput');
+const pdfToolHint = document.getElementById('pdfToolHint');
+const pdfToolStatus = document.getElementById('pdfToolStatus');
+
+function updatePdfToolInputs() {
+    const tool = pdfToolSelect.value;
+    const showMultiple = tool === 'merge' || tool === 'organize';
+    pdfToolFiles.multiple = showMultiple;
+    pdfToolFiles.setAttribute('multiple', '');
+    if (showMultiple) {
+        pdfToolFiles.setAttribute('data-mode', 'multi');
+    } else {
+        pdfToolFiles.removeAttribute('data-mode');
+    }
+    pageRangeInput.style.display = (tool === 'split' || tool === 'page_remover' || tool === 'extract_pages') ? 'block' : 'none';
+    rotationInput.style.display = tool === 'rotate' ? 'block' : 'none';
+    watermarkInput.style.display = tool === 'watermark' ? 'block' : 'none';
+    passwordInput.style.display = (tool === 'unlock' || tool === 'protect') ? 'block' : 'none';
+    scaleInput.style.display = tool === 'resize' ? 'block' : 'none';
+    cropBoxInput.style.display = tool === 'crop' ? 'block' : 'none';
+    if (tool === 'merge') {
+        pdfToolHint.textContent = 'Select at least two PDFs to merge.';
+    } else if (tool === 'organize') {
+        pdfToolHint.textContent = 'Select two or more PDFs to organize.';
+    } else if (tool === 'page_remover') {
+        pdfToolHint.textContent = 'Specify pages to remove (e.g. 1,3,5-7).';
+    } else if (tool === 'extract_pages') {
+        pdfToolHint.textContent = 'Specify pages to extract (e.g. 1-3,5).';
+    } else if (tool === 'unlock') {
+        pdfToolHint.textContent = 'Enter password if PDF is protected.';
+    } else if (tool === 'protect') {
+        pdfToolHint.textContent = 'Enter password (min 4 characters).';
+    } else if (tool === 'resize') {
+        pdfToolHint.textContent = 'Enter scale percentage (e.g. 50 for half size).';
+    } else if (tool === 'crop') {
+        pdfToolHint.textContent = 'Enter crop box: left,bottom,right,top in points.';
+    } else {
+        pdfToolHint.textContent = 'Select one PDF file and run the selected tool.';
+    }
+}
+pdfToolSelect.addEventListener('change', updatePdfToolInputs);
+updatePdfToolInputs();
+
+pdfToolFiles.addEventListener('change', () => {
+    const count = pdfToolFiles.files.length;
+    const label = count > 0 ? `${count} file${count > 1 ? 's' : ''} selected` : 'Select one or more PDF files. Hold Ctrl (or Cmd) to select multiple files.';
+    document.getElementById('pdfToolFilesHint').textContent = label;
+    const list = document.getElementById('pdfToolFilesList');
+    list.innerHTML = '';
+    Array.from(pdfToolFiles.files).forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'd-flex align-items-center justify-content-between border rounded px-2 py-1 mb-1';
+        item.style.fontSize = '0.85rem';
+        item.innerHTML = `<span class="text-truncate me-2" style="max-width:80%;">${index + 1}. ${file.name}</span><small class="text-muted">${(file.size / 1024 / 1024).toFixed(2)} MB</small>`;
+        list.appendChild(item);
+    });
+});
+
+pdfToolForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const tool = pdfToolSelect.value;
+    if (tool === 'merge' && pdfToolFiles.files.length < 2) {
+        pdfToolHint.textContent = 'Please select at least two PDF files to merge.';
+        return;
+    }
+    if (tool === 'organize' && pdfToolFiles.files.length < 2) {
+        pdfToolHint.textContent = 'Please select at least two PDF files to organize.';
+        return;
+    }
+    const fd = new FormData();
+    fd.append('tool', tool);
+    fd.append('page_range', pageRangeInput.value);
+    fd.append('rotation', rotationInput.value);
+    fd.append('watermark_text', watermarkInput.value);
+    fd.append('password', passwordInput.value);
+    fd.append('scale', scaleInput.value);
+    fd.append('crop_box', cropBoxInput.value);
+    Array.from(pdfToolFiles.files).forEach((file) => fd.append('pdf_files', file));
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrfToken) {
+        fd.append('csrfmiddlewaretoken', csrfToken.value);
+    }
+    const button = document.getElementById('pdfToolBtn');
+    button.disabled = true;
+    button.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Processing…';
+    pdfToolStatus.style.display = 'block';
+    pdfToolStatus.className = 'alert alert-info';
+    pdfToolStatus.innerHTML = '<i class="bi bi-hourglass-split me-2"></i> Processing your PDF…';
+
+    try {
+        const response = await fetch(`/pdf-tools/${tool}/`, { method: 'POST', body: fd });
+        let data;
+        try {
+            data = await response.json();
+        } catch (parseError) {
+            const text = await response.text();
+            throw new Error(`Server error (${response.status}): ${text.substring(0, 200)}`);
+        }
+        if (response.ok && data.success) {
+            pdfToolStatus.className = 'alert alert-success';
+            pdfToolStatus.innerHTML = `<i class="bi bi-check-circle me-2"></i> Your PDF is ready. <a href="${data.download_url}" class="alert-link" download>Download ${data.filename}</a>`;
+        } else {
+            pdfToolStatus.className = 'alert alert-danger';
+            pdfToolStatus.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>${data.error || 'The selected PDF tool failed.'}`;
+        }
+    } catch (error) {
+        pdfToolStatus.className = 'alert alert-danger';
+        pdfToolStatus.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>${error.message || 'An unexpected error occurred. Please check server logs.'}`;
+    } finally {
+        button.disabled = false;
+        button.innerHTML = '<i class="bi bi-tools me-1"></i> Run Tool';
+    }
+});
+</script>
+{% endblock %}

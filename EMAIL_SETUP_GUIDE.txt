@@ -1,0 +1,116 @@
+================================================================================
+                    EMAIL SETUP GUIDE - PASSWORD RESET
+================================================================================
+
+CURRENT ISSUE:
+--------------
+The system is currently configured to print emails to the console (for testing).
+To receive actual emails in your inbox, you need to configure Gmail SMTP.
+
+================================================================================
+STEP 1: ENABLE GMAIL SMTP
+================================================================================
+
+1. Go to your Google Account: https://myaccount.google.com
+2. Click "Security" in the left menu
+3. Enable "2-Step Verification" (if not already enabled)
+4. Search for "App Passwords" in the search bar
+5. Create an App Password:
+   - Select "Mail" as the app
+   - Select "Other (Custom name)" as the device
+   - Name it: "Core Synch Solutions"
+   - Click "Generate"
+6. Copy the 16-character password (e.g., "abcd efgh ijkl mnop")
+
+================================================================================
+STEP 2: UPDATE SETTINGS.PY
+================================================================================
+
+Open: word_converter/settings.py
+
+Find the email configuration section and update it:
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'your-email@gmail.com'  # Your Gmail address
+EMAIL_HOST_PASSWORD = 'your-app-password'  # The 16-char app password from Step 1
+DEFAULT_FROM_EMAIL = 'Core Synch Solutions <noreply@coresynch.com>'
+
+================================================================================
+STEP 3: TEST THE EMAIL
+================================================================================
+
+1. Start the Django server:
+   python manage.py runserver
+
+2. Go to: http://127.0.0.1:8000/accounts/login/
+
+3. Click "Forgot Password?"
+
+4. Enter your email address
+
+5. Check your inbox (and spam folder) for the reset email
+
+================================================================================
+ALTERNATIVE: USE CONSOLE FOR TESTING
+================================================================================
+
+If you don't want to set up Gmail right now, you can use console mode:
+
+In settings.py, use:
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+Then:
+1. Start the server
+2. Request password reset
+3. Look at the server console/terminal
+4. You'll see the email content printed there
+5. Copy the reset link from the console
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+Problem: "SMTPAuthenticationError"
+Solution: 
+- Make sure 2-Step Verification is enabled
+- Use App Password, not your regular Gmail password
+- Check that EMAIL_HOST_USER is correct
+
+Problem: "Connection refused"
+Solution:
+- Check your internet connection
+- Verify EMAIL_HOST and EMAIL_PORT are correct
+- Try EMAIL_PORT = 465 with EMAIL_USE_SSL = True
+
+Problem: Email not received
+Solution:
+- Check spam/junk folder
+- Verify the email address is correct
+- Wait a few minutes (sometimes delayed)
+- Check Django console for errors
+
+================================================================================
+FOR PRODUCTION
+================================================================================
+
+When deploying to production, consider using:
+- SendGrid (recommended for production)
+- Mailgun
+- Amazon SES
+- Or your own SMTP server
+
+Example with SendGrid:
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.sendgrid.net'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'apikey'
+EMAIL_HOST_PASSWORD = 'your-sendgrid-api-key'
+
+================================================================================
+
+Need help? Check the Django documentation:
+https://docs.djangoproject.com/en/stable/topics/email/

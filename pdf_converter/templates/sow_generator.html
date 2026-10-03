@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Scheme of Work Generator - Core Synch Solutions{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card border-0" style="border-radius: 20px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+            <div class="card-body p-4">
+                <div class="text-center mb-4">
+                    <div style="width: 64px; height: 64px; background: linear-gradient(135deg, #8b5cf6, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                        <i class="bi bi-calendar-week text-white" style="font-size: 1.8rem;"></i>
+                    </div>
+                    <h3 class="fw-bold mb-2" style="color: #0f172a;">Scheme of Work Generator</h3>
+                    <p class="text-muted">Generate lesson schemes for your class. Enter details below and download instantly.</p>
+                </div>
+                
+                {% if user.is_authenticated and user.is_staff %}
+                <ul class="nav nav-tabs mb-4" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="manual-tab" data-bs-toggle="tab" data-bs-target="#manual-mode" type="button">
+                            <i class="bi bi-pencil me-1"></i> Manual Entry
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="curriculum-tab" data-bs-toggle="tab" data-bs-target="#curriculum-mode" type="button">
+                            <i class="bi bi-upload me-1"></i> Curriculum Upload
+                        </button>
+                    </li>
+                </ul>
+                {% endif %}
+                
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="manual-mode">
+                        <form method="POST" action="{% url 'sow_preview' %}">
+                            {% csrf_token %}
+                            <input type="hidden" name="mode" value="manual">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">School Name</label>
+                                    <input type="text" name="school_name" class="form-control" placeholder="e.g., St. Mary's High School" style="border-radius: 8px;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Class / Grade</label>
+                                    <select name="class_id" class="form-select" style="border-radius: 8px;">
+                                        <option value="">Select Class/Grade</option>
+                                        {% for class_obj in classes %}
+                                        <option value="{{ class_obj.id }}">{{ class_obj.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Subject</label>
+                                    <select name="subject_id" class="form-select" required style="border-radius: 8px;">
+                                        <option value="">Select Subject</option>
+                                        {% for subject in subjects %}
+                                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Term</label>
+                                    <select name="term" class="form-select" style="border-radius: 8px;">
+                                        <option value="Term 1">Term 1</option>
+                                        <option value="Term 2">Term 2</option>
+                                        <option value="Term 3">Term 3</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Academic Year</label>
+                                    <input type="text" name="academic_year" class="form-control" placeholder="e.g., 2024" required style="border-radius: 8px;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Number of Weeks</label>
+                                    <input type="number" name="weeks_count" class="form-control" value="12" min="1" max="52" style="border-radius: 8px;">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn w-100 py-2" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed); border: none; color: #fff; border-radius: 10px; font-weight: 600;">
+                                        <i class="bi bi-eye me-2"></i> Preview & Customize Scheme
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    
+                    {% if user.is_authenticated and user.is_staff %}
+                    <div class="tab-pane fade" id="curriculum-mode">
+                        <form method="POST" action="{% url 'sow_preview' %}" enctype="multipart/form-data">
+                            {% csrf_token %}
+                            <input type="hidden" name="mode" value="curriculum">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Class / Grade</label>
+                                    <select name="class_id" class="form-select" required style="border-radius: 8px;">
+                                        <option value="">Select Class/Grade</option>
+                                        {% for class_obj in classes %}
+                                        <option value="{{ class_obj.id }}">{{ class_obj.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Subject</label>
+                                    <select name="subject_id" class="form-select" required style="border-radius: 8px;">
+                                        <option value="">Select Subject</option>
+                                        {% for subject in subjects %}
+                                        <option value="{{ subject.id }}">{{ subject.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Curriculum File (PDF/DOCX)</label>
+                                    <input type="file" name="curriculum_file" class="form-control" accept=".pdf,.docx" required style="border-radius: 8px;">
+                                    <small class="text-muted">Upload curriculum document to extract topics automatically</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Curriculum Type</label>
+                                    <select name="curriculum_type" class="form-select" style="border-radius: 8px;">
+                                        <option value="cbc">CBC</option>
+                                        <option value="8-4-4">8-4-4</option>
+                                        <option value="international">International</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-medium" style="color: #0f172a;">Academic Year</label>
+                                    <input type="text" name="academic_year" class="form-control" placeholder="e.g., 2024" value="2024" style="border-radius: 8px;">
+                                </div>
+                                <div class="col-12">
+                                    <button type="submit" class="btn w-100 py-2" style="background: linear-gradient(135deg, #10b981, #059669); border: none; color: #fff; border-radius: 10px; font-weight: 600;">
+                                        <i class="bi bi-upload me-2"></i> Extract & Preview Scheme
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

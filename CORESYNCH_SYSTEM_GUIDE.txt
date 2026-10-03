@@ -1,0 +1,531 @@
+================================================================================
+                    CORE SYNCH SOLUTIONS - COMPLETE SYSTEM GUIDE
+================================================================================
+
+TABLE OF CONTENTS
+-----------------
+1. Introduction
+2. Getting Started
+3. Document Conversion
+4. Revision Materials
+5. Subscriptions & Plans
+6. User Dashboard
+7. Admin Features
+8. FAQs
+
+================================================================================
+1. INTRODUCTION
+================================================================================
+
+Core Synch Solutions is a comprehensive educational platform that provides:
+
+• Document Conversion: Convert PDFs and images to various formats (Word, 
+  PowerPoint, HTML, etc.)
+• Revision Materials: Access past papers, marking schemes, notes, and textbooks
+• Flexible Subscriptions: Individual and school-based plans with different 
+  feature access
+
+KEY FEATURES:
+-------------
+• Convert PDF to DOCX, DOC, TXT, HTML, JSON, CSV, PPTX
+• Free Word-to-PDF conversion
+• OCR for scanned documents
+• Revision materials for CBE and 8-4-4 curricula
+• Individual and school subscription plans
+• Advanced search and filtering
+• User dashboard with activity tracking
+
+================================================================================
+2. GETTING STARTED
+================================================================================
+
+FOR INDIVIDUAL USERS:
+---------------------
+
+Step 1: Create an Account
+  1. Visit the homepage: http://127.0.0.1:8000/
+  2. Click "Sign Up" in the top navigation
+  3. Fill in your details:
+     - Username
+     - Email address
+     - Password (minimum 8 characters)
+  4. Click "Create Account"
+
+Step 2: Browse Features
+  • Document Converter: Upload and convert PDFs
+  • Revision Materials: Browse free materials (no subscription required)
+  • Subscription Plans: Upgrade for premium features
+
+FOR SCHOOL ADMINISTRATORS:
+--------------------------
+
+Step 1: Register Your School
+  1. Visit the homepage
+  2. Click "Sign Up"
+  3. Select "Register a School instead" link
+  4. Fill in school details:
+     - School name
+     - School address
+     - Phone number
+     - Email
+     - Principal name
+     - Username and password
+  5. Click "Create Account"
+
+Step 2: Subscribe to a Plan
+  1. After registration, you'll be redirected to subscription plans
+  2. Choose a plan suitable for your school
+  3. Complete payment via M-Pesa
+  4. Subscription activates immediately
+
+================================================================================
+3. DOCUMENT CONVERSION
+================================================================================
+
+FREE CONVERSION: WORD TO PDF
+-----------------------------
+No payment required!
+
+Steps:
+  1. Scroll to the "Word to PDF Converter" section (green card)
+  2. Click "Choose File" or drag-and-drop a .docx file
+  3. Click "Convert to PDF"
+  4. Wait for conversion to complete
+  5. Click "Download PDF"
+
+Supported format: .docx only
+
+PAID CONVERSION: PDF TO OTHER FORMATS
+--------------------------------------
+Cost: KSH 2 per page
+
+Step 1: Upload File
+  • Go to the main converter section
+  • Click "Choose File" or drag-and-drop a PDF/image
+  • Supported formats: PDF, PNG, JPG, JPEG, GIF, BMP
+
+Step 2: Configure Settings
+  • Output Format: Select from:
+    - Word Document (.docx)
+    - Word 97-2003 (.doc)
+    - Text File (.txt)
+    - HTML Document (.html)
+    - JSON Data (.json)
+    - CSV Spreadsheet (.csv)
+    - PowerPoint (.pptx)
+  • Use OCR: Check this box for scanned documents (requires subscription)
+
+Step 3: Convert and Pay
+  1. Click "Convert Now"
+  2. System shows estimated pages and cost
+  3. After conversion, click "Pay with M-Pesa"
+  4. Enter your M-Pesa phone number
+  5. Complete payment
+  6. Download your converted file
+
+CONVERSION HISTORY:
+-------------------
+• View all your conversions in Dashboard → Recent Conversions
+• Download completed files anytime
+• Track your spending
+
+================================================================================
+4. REVISION MATERIALS
+================================================================================
+
+BROWSING MATERIALS:
+-------------------
+
+Option 1: Browse by Curriculum
+  1. Click "Revision" in the navigation menu
+  2. Choose your curriculum:
+     - CBE (Competency-Based Education)
+     - 8-4-4 (Traditional curriculum)
+  3. Select your level:
+     - Primary School
+     - Secondary School
+     - College/University
+  4. Click on a class to view subjects
+  5. Select a subject to see available materials
+
+Option 2: Browse by Subject
+  1. From Revision home, click "Browse by Subject"
+  2. See all subjects with available materials
+  3. Filter by curriculum (CBE or 8-4-4)
+  4. Click on a subject to view materials
+
+Option 3: Advanced Search
+  1. Click "Search" in the navigation menu
+  2. Use filters:
+     - Keyword: Search by title, subject, or description
+     - Type: Past Paper, Marking Scheme, Notes, Textbook
+     - Class: Filter by specific class
+     - Term: Term 1, 2, or 3
+     - Year: Select academic year
+     - Price: Free or Paid materials
+     - Sort: Newest, Oldest, Most Downloaded, Title
+  3. Click "Search" to see results
+
+MATERIAL TYPES:
+---------------
+• Past Papers: Previous exam papers
+• Marking Schemes: Official answers and grading rubrics
+• Notes: Study notes and summaries
+• Textbooks: Digital textbook resources
+
+ACCESSING MATERIALS:
+--------------------
+
+Free Materials:
+  • No subscription required
+  • Available to all users (including anonymous)
+  • Click "View" to see details
+  • Click "Download" to get the file
+
+Premium Materials:
+  • Requires active subscription with revision access
+  • Click "View" to see details
+  • If you have access: Download immediately
+  • If not: You'll be prompted to subscribe
+
+MATERIAL DETAILS PAGE:
+----------------------
+• Title and description
+• Subject and class information
+• Material type and term
+• Price (Free or KSH amount)
+• Download count
+• Preview text (first pages)
+• Related materials (e.g., past paper + marking scheme)
+
+================================================================================
+5. SUBSCRIPTIONS & PLANS
+================================================================================
+
+PLAN TYPES:
+-----------
+
+For Individual Users:
+  • Personal Learning Plan: KSH 500/year
+    - Revision materials access
+    - PDF conversions
+  
+  • Student Premium: KSH 1,000/year
+    - Full access including OCR
+    - Unlimited conversions
+
+For Schools:
+  • School Basic: KSH 2,000/year
+    - PDF conversions only
+    - Up to 10 teachers
+  
+  • School Standard: KSH 3,500/year
+    - Conversions + Revision materials
+    - Unlimited teachers
+  
+  • School Premium: KSH 5,000/year
+    - Full access including OCR
+    - Unlimited everything
+
+SUBSCRIBING TO A PLAN:
+----------------------
+
+Step 1: View Available Plans
+  1. Click "Subscription Plans" in navigation
+  2. See plans available for your account type:
+     - Individual users: See individual and "both" plans
+     - School users: See school and "both" plans
+
+Step 2: Select a Plan
+  1. Click "Subscribe Now" on your chosen plan
+  2. Review plan details:
+     - Name and price
+     - Duration (Termly/Yearly)
+     - Features included
+  3. Click "Subscribe"
+
+Step 3: Complete Payment
+  1. Enter your M-Pesa phone number
+  2. Click "Pay with M-Pesa"
+  3. You'll receive an M-Pesa prompt on your phone
+  4. Enter your PIN to complete payment
+  5. Subscription activates immediately
+
+MANAGING YOUR SUBSCRIPTION:
+---------------------------
+
+View Current Subscription:
+  • Go to Dashboard
+  • Check Subscription Status card
+  • See active plan and expiry date
+
+Renew Subscription:
+  1. Go to Subscription Plans
+  2. If you have an active subscription, you'll see it
+  3. Click "Renew" when near expiry
+  4. Complete payment
+
+PLAN FEATURES:
+--------------
+
+Revision Access:
+  • Allows viewing and downloading revision materials
+  • Some plans exclude revision (conversion-only plans)
+  • Check plan details before subscribing
+
+PDF Conversion:
+  • Convert PDFs to various formats
+  • KSH 2 per page
+  • OCR for scanned documents (premium feature)
+
+OCR (Optical Character Recognition):
+  • Converts scanned/image PDFs to text
+  • Requires premium subscription
+  • Useful for non-selectable text
+
+================================================================================
+6. USER DASHBOARD
+================================================================================
+
+ACCESSING YOUR DASHBOARD:
+-------------------------
+1. Login to your account
+2. Click "Dashboard" in the navigation menu
+
+DASHBOARD SECTIONS:
+-------------------
+
+Stats Overview:
+  • Total Conversions: Number of files you've converted
+  • Total Spent: Amount paid for conversions
+  • Materials Downloaded: Revision materials downloaded
+  • Subscription Status: Active/Pending/None
+
+Recent Conversions:
+  • Shows your last 10 conversions
+  • File name, format, and status
+  • Download button for completed files
+  • Link to full conversion history
+
+Quick Actions:
+  • New Conversion: Go to converter
+  • Revision Materials: Browse materials
+  • Subscription: View/upgrade plan
+  • Profile: View account details
+
+Popular Revision Materials:
+  • Trending free materials
+  • Quick access to popular resources
+  • Download directly from dashboard
+
+================================================================================
+7. ADMIN FEATURES
+================================================================================
+
+ACCESSING ADMIN DASHBOARD:
+--------------------------
+1. Login with staff/admin credentials
+2. Click "Dashboard" in navigation (staff only)
+
+ADMIN DASHBOARD SECTIONS:
+-------------------------
+
+Statistics Overview:
+  • Total conversions across all users
+  • Total revenue generated
+  • Total revision materials
+  • Total downloads
+
+Weekly Performance:
+  • Daily conversion activity
+  • Payment transactions
+  • Revenue per day
+
+Recent Activity:
+  • Latest conversions
+  • Payment records
+  • Failed conversions
+
+Attention Needed:
+  • Pending payments
+  • Failed conversions
+  • Issues requiring action
+
+Quick Actions:
+  • Manage subscription plans
+  • Upload revision materials
+  • Add subjects
+  • View all materials
+  • Access Django Admin
+
+DJANGO ADMIN PANEL:
+-------------------
+
+Access at: http://127.0.0.1:8000/admin/
+
+Managing Subscription Plans:
+  1. Go to Django Admin
+  2. Click "Subscription plans"
+  3. Click "Add subscription plan"
+  4. Fill in details:
+     - Name: Plan name (e.g., "School Premium")
+     - Plan Type: Basic/Standard/Premium
+     - Plan Target: Individual/School/Both
+     - Duration: Per Term or Per Year
+     - Amount: Price in KSH
+     - Features: Check what's included
+     - Limits: Max teachers/classes (0 = unlimited)
+  5. Click "Save"
+
+Managing Revision Materials:
+  1. In Django Admin, click "Revision materials"
+  2. Click "Add revision material"
+  3. Fill in details:
+     - Title: Material name
+     - Subject: Select subject
+     - Type: Past Paper/Marking Scheme/Notes/Textbook
+     - Term: Term 1/2/3
+     - Year: Academic year
+     - Price: Free or paid amount
+     - File: Upload the document
+  4. Click "Save"
+
+Linking Materials:
+  • Link past papers to their marking schemes
+  • Go to "Link Materials" in revision admin
+  • Select past paper and marking scheme
+  • Click "Link"
+
+================================================================================
+8. FAQs
+================================================================================
+
+GENERAL QUESTIONS:
+------------------
+
+Q: Do I need to create an account to use the platform?
+A: No, you can browse and download free revision materials without an account. 
+   However, you need an account to:
+   - Convert PDFs
+   - Download premium materials
+   - Access advanced features
+
+Q: What's the difference between individual and school subscriptions?
+A: 
+   • Individual: For personal use, one user only
+   • School: For entire school, multiple teachers can access
+
+Q: Can I upgrade my plan later?
+A: Yes! You can upgrade anytime. Go to Subscription Plans and select a higher tier.
+
+DOCUMENT CONVERSION:
+-------------------
+
+Q: How much does conversion cost?
+A: KSH 2 per page for PDF conversions. Word-to-PDF is FREE.
+
+Q: What is OCR?
+A: Optical Character Recognition - it converts scanned/image PDFs to editable 
+   text. Requires premium subscription.
+
+Q: How long does conversion take?
+A: Usually 10-30 seconds depending on file size and format.
+
+Q: Can I convert multiple files at once?
+A: Currently, conversions are one file at a time. Batch conversion may be added 
+   in future updates.
+
+REVISION MATERIALS:
+-------------------
+
+Q: Are all materials free?
+A: No, some materials are free, while others require an active subscription 
+   with revision access.
+
+Q: How do I know if a material is free or paid?
+A: Each material shows a badge:
+   • Green "Free" badge: No subscription needed
+   • Yellow "KSH X" badge: Requires subscription
+
+Q: Can I preview materials before downloading?
+A: Yes, click "View" to see a preview with the first few pages (for PDFs).
+
+Q: What curricula are supported?
+A: Both CBE (Competency-Based Education) and 8-4-4 (Traditional) curricula.
+
+SUBSCRIPTIONS:
+--------------
+
+Q: How do I pay?
+A: We use M-Pesa. Enter your phone number during checkout and follow the prompts.
+
+Q: How long does my subscription last?
+A: Depends on the plan:
+   • Termly: 3 months (one school term)
+   • Yearly: 12 months
+
+Q: Can I cancel my subscription?
+A: Subscriptions auto-expire at the end of the period. Contact admin for early 
+   cancellation.
+
+Q: What happens when my subscription expires?
+A: You lose access to premium features. Your data and conversions are preserved.
+
+TECHNICAL SUPPORT:
+------------------
+
+Q: I'm getting an error. What should I do?
+A: 
+   1. Refresh the page and try again
+   2. Check your internet connection
+   3. Ensure your file is not corrupted
+   4. Contact support if issue persists
+
+Q: What browsers are supported?
+A: Modern browsers including:
+   • Google Chrome (recommended)
+   • Mozilla Firefox
+   • Microsoft Edge
+   • Safari
+
+Q: Is my data secure?
+A: Yes, we use industry-standard security practices. Your files and personal 
+   information are protected.
+
+================================================================================
+CONTACT INFORMATION
+================================================================================
+
+Company: Core Synch Solutions
+Platform: Educational Document Management System
+Version: 1.0
+Last Updated: June 2026
+
+================================================================================
+QUICK REFERENCE
+================================================================================
+
+NAVIGATION MENU:
+----------------
+• Home: Document converter and platform overview
+• Revision: Browse revision materials
+• Search: Advanced material search
+• Dashboard: Your personal dashboard (logged in)
+• Profile: Account settings (logged in)
+• Sign Up/Login: Account management
+
+TIPS FOR BEST EXPERIENCE:
+-------------------------
+1. Use Google Chrome for optimal performance
+2. Ensure stable internet for uploads/downloads
+3. Use OCR only for scanned documents (saves time)
+4. Check file size before uploading (large files take longer)
+5. Keep your subscription active for uninterrupted access
+
+================================================================================
+
+This guide is regularly updated. Check back for new features and improvements.
+
+© 2026 Core Synch Solutions. All rights reserved.
+
+================================================================================

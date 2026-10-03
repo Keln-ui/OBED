@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Subscription Plans{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="text-center mb-5">
+        <h1 class="display-5">📋 Choose Your Subscription Plan</h1>
+        <p class="lead text-muted">Subscribe to access premium document conversion features.</p>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if active_subscription %}
+        <div class="alert alert-success">
+            <h5><i class="bi bi-check-circle-fill"></i> Active Subscription</h5>
+            <p class="mb-0">
+                <strong>{{ active_subscription.plan.name }}</strong> — 
+                {{ active_subscription.start_date }} to {{ active_subscription.end_date }}
+            </p>
+        </div>
+    {% endif %}
+
+    <div class="row g-4">
+        {% for plan in plans %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card h-100 shadow-sm border-{{ plan.duration|yesno:'primary,success' }}">
+                    <div class="card-header bg-{{ plan.duration|yesno:'primary,success' }} text-white text-center py-3">
+                        <h4 class="mb-0">{{ plan.name }}</h4>
+                    </div>
+                    <div class="card-body text-center">
+                        <div class="mb-3">
+                            <span class="display-4 fw-bold">{{ plan.amount }}</span>
+                            <span class="text-muted">KSH</span>
+                        </div>
+                        <p class="text-muted">
+                            <i class="bi bi-calendar-check"></i> 
+                            {{ plan.get_duration_display }}
+                        </p>
+                        <ul class="list-unstyled mt-3 mb-4">
+                            <li class="py-1">
+                                <i class="bi bi-check-circle text-success"></i>
+                                {% if plan.max_teachers > 0 %}
+                                    Up to {{ plan.max_teachers }} Teachers
+                                {% else %}
+                                    Unlimited Teachers
+                                {% endif %}
+                            </li>
+                            <li class="py-1">
+                                <i class="bi bi-check-circle text-success"></i>
+                                {% if plan.max_classes > 0 %}
+                                    Up to {{ plan.max_classes }} Classes
+                                {% else %}
+                                    Unlimited Classes
+                                {% endif %}
+                            </li>
+                            <li class="py-1"><i class="bi bi-check-circle text-success"></i> Revision Materials Access</li>
+                            <li class="py-1"><i class="bi bi-check-circle text-success"></i> Priority Support</li>
+                        </ul>
+                    </div>
+                    <div class="card-footer bg-white border-0 pb-4 text-center">
+                        {% if active_subscription %}
+                            <button class="btn btn-secondary btn-lg w-75" disabled>Already Subscribed</button>
+                        {% else %}
+                            <a href="{% url 'subscribe_plan' plan.id %}" class="btn btn-success btn-lg w-75">
+                                <i class="bi bi-phone"></i> Subscribe Now
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <div class="alert alert-info text-center">
+                    <h5>No subscription plans available yet.</h5>
+                    <p class="mb-0">Please contact the administrator to set up plans.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

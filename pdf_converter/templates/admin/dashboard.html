@@ -1,0 +1,392 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard - Core Synch Solutions{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <!-- Header -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="fw-bold mb-1" style="color: #1e293b; font-size: 1.8rem;">
+                <i class="bi bi-speedometer2" style="color: #667eea;"></i> Admin Dashboard
+            </h1>
+            <p class="text-muted mb-0">
+                <i class="bi bi-calendar3"></i> 
+                {% if daily_stats %}
+                    {{ daily_stats.0.date|date:"l, F j, Y" }}
+                {% else %}
+                    Today
+                {% endif %}
+                <span class="mx-2">•</span>
+                <i class="bi bi-arrow-repeat"></i> Live overview
+            </p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/admin/" class="btn btn-outline-secondary">
+                <i class="bi bi-gear"></i> Django Admin
+            </a>
+            <a href="/" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+                <i class="bi bi-house"></i> Main Site
+            </a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-3 mb-4">
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #667eea, #764ba2);">
+                <div class="card-body text-white p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Total Conversions</p>
+                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">{{ total_conversions }}</h3>
+                        </div>
+                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-file-earmark-arrow-up" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #10b981, #059669);">
+                <div class="card-body text-white p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Revenue</p>
+                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">KSH {{ total_revenue|floatformat:0 }}</h3>
+                        </div>
+                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-cash-stack" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #f59e0b, #d97706);">
+                <div class="card-body text-white p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Materials</p>
+                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">{{ total_materials }}</h3>
+                        </div>
+                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-journals" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-xl-3 col-md-6">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #3b82f6, #2563eb);">
+                <div class="card-body text-white p-4">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Downloads</p>
+                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">{{ total_downloads }}</h3>
+                        </div>
+                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
+                            <i class="bi bi-download" style="font-size: 1.5rem;"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Payment Mode Control -->
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px; {% if is_free_period %}background: linear-gradient(135deg, #d1fae5, #a7f3d0);{% else %}background: linear-gradient(135deg, #fef3c7, #fde68a);{% endif %}">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                        <div>
+                            <h5 class="fw-bold mb-1" style="color: #0f172a;">
+                                <i class="bi bi-{% if is_free_period %}unlock{% else %}lock{% endif %}-fill"></i>
+                                {% if is_free_period %}Free Period Active{% else %}Paid Period Active{% endif %}
+                            </h5>
+                            <p class="mb-0" style="color: #475569; font-size: 0.9rem;">
+                                {% if is_free_period %}
+                                    All conversions and revision materials are currently free for users.
+                                {% else %}
+                                    Users are being charged KSH {{ payment_settings.conversion_cost_per_page }}/page for conversions and KSH {{ payment_settings.global_revision_price }} for premium materials.
+                                {% endif %}
+                            </p>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'admin_payment_settings' %}" class="btn btn-primary">
+                                <i class="bi bi-credit-card"></i> Payment Settings
+                            </a>
+                            <form method="POST" action="{% url 'toggle_free_period' %}" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-{% if is_free_period %}warning{% else %}success{% endif %}" style="border: none; color: #fff;">
+                                    <i class="bi bi-{% if is_free_period %}lock{% else %}unlock{% endif %}"></i>
+                                    {% if is_free_period %}Stop Free Period{% else %}Start Free Period{% endif %}
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Weekly Performance -->
+        <div class="col-xl-8">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <div>
+                            <h5 class="fw-bold mb-1" style="color: #1e293b;">
+                                <i class="bi bi-graph-up-arrow" style="color: #667eea;"></i> Weekly Performance
+                            </h5>
+                            <p class="text-muted mb-0" style="font-size: 0.9rem;">Daily conversion and payment activity</p>
+                        </div>
+                        <span class="badge bg-light text-dark" style="border-radius: 8px; font-size: 0.75rem;">
+                            <i class="bi bi-clock"></i> Updated now
+                        </span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr style="background: #f8fafc;">
+                                    <th class="border-0" style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Day</th>
+                                    <th class="border-0" style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Date</th>
+                                    <th class="border-0 text-center" style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Conversions</th>
+                                    <th class="border-0 text-center" style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Payments</th>
+                                    <th class="border-0 text-end" style="font-size: 0.75rem; text-transform: uppercase; color: #64748b; font-weight: 600;">Revenue</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for day in daily_stats %}
+                                <tr style="border-bottom: 1px solid #f1f5f9;">
+                                    <td class="fw-semibold" style="color: #1e293b;">{{ day.date|date:"D" }}</td>
+                                    <td style="color: #64748b;">{{ day.date|date:"M j, Y" }}</td>
+                                    <td class="text-center">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary" style="border-radius: 6px;">{{ day.conversions }}</span>
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge bg-success bg-opacity-10 text-success" style="border-radius: 6px;">{{ day.payments }}</span>
+                                    </td>
+                                    <td class="text-end fw-semibold" style="color: #1e293b;">KSH {{ day.revenue|floatformat:0 }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4 text-muted">No activity data available yet.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-xl-4">
+            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3" style="color: #1e293b;">
+                        <i class="bi bi-lightning-charge" style="color: #f59e0b;"></i> Quick Actions
+                    </h5>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Common admin tasks</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'admin_payment_settings' %}" class="btn text-start" style="border-radius: 10px; border: 1px solid #e2e8f0; background: linear-gradient(135deg, #f59e0b, #d97706); color: #fff;">
+                            <i class="bi bi-credit-card me-2"></i> Payment Settings
+                        </a>
+                        <a href="/admin/revision/schemeofwork/add/" class="btn text-start" style="border-radius: 10px; border: 1px solid #e2e8f0; background: linear-gradient(135deg, #059669, #10b981); color: #fff;">
+                            <i class="bi bi-upload me-2"></i> Upload Schemes of Work
+                        </a>
+                        <a href="/sow-generator/" class="btn text-start" style="border-radius: 10px; border: 1px solid #e2e8f0; background: linear-gradient(135deg, #8b5cf6, #7c3aed); color: #fff;">
+                            <i class="bi bi-calendar-week me-2"></i> Scheme of Work Generator
+                        </a>
+                        <a href="/admin/plans/" class="btn btn-outline-primary text-start" style="border-radius: 10px; border: 1px solid #e2e8f0;">
+                            <i class="bi bi-credit-card me-2"></i> Subscription Plans
+                        </a>
+                        <a href="/admin/revision/revisionmaterial/add/" class="btn btn-outline-success text-start" style="border-radius: 10px; border: 1px solid #e2e8f0;">
+                            <i class="bi bi-upload me-2"></i> Upload Material
+                        </a>
+                        <a href="/admin/revision/subject/add/" class="btn btn-outline-info text-start" style="border-radius: 10px; border: 1px solid #e2e8f0;">
+                            <i class="bi bi-journal-plus me-2"></i> Add Subject
+                        </a>
+                        <a href="/admin/revision/revisionmaterial/" class="btn btn-outline-warning text-start" style="border-radius: 10px; border: 1px solid #e2e8f0;">
+                            <i class="bi bi-collection me-2"></i> All Materials
+                        </a>
+                        <a href="/admin/" class="btn btn-outline-secondary text-start" style="border-radius: 10px; border: 1px solid #e2e8f0;">
+                            <i class="bi bi-gear me-2"></i> Django Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <!-- Recent Activity -->
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3" style="color: #1e293b;">
+                        <i class="bi bi-clock-history" style="color: #667eea;"></i> Recent Activity
+                    </h5>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Latest conversions and payments</p>
+                    
+                    <div class="list-group list-group-flush">
+                        {% for conversion in recent_conversions %}
+                        <div class="list-group-item border-0 px-0 py-3" style="border-bottom: 1px solid #f1f5f9;">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 40px; height: 40px; background: #eef2ff; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-file-earmark-richtext" style="color: #667eea;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold" style="color: #1e293b; font-size: 0.95rem;">{{ conversion.original_pdf_filename }}</div>
+                                    <small class="text-muted">{{ conversion.output_format|upper }} • {{ conversion.status }}</small>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.85rem;">{{ conversion.created_at|date:"M j" }}</small>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-inbox" style="font-size: 2rem; opacity: 0.3;"></i>
+                            <p class="mb-0 mt-2">No recent conversions</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attention Needed -->
+        <div class="col-xl-6">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3" style="color: #1e293b;">
+                        <i class="bi bi-exclamation-triangle" style="color: #f59e0b;"></i> Attention Needed
+                    </h5>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Pending payments and issues</p>
+                    
+                    <div class="list-group list-group-flush">
+                        {% for payment in pending_payments %}
+                        <div class="list-group-item border-0 px-0 py-3" style="border-bottom: 1px solid #f1f5f9;">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 40px; height: 40px; background: #fef3c7; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-cash" style="color: #f59e0b;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold" style="color: #1e293b; font-size: 0.95rem;">{{ payment.phone_number }}</div>
+                                    <small class="text-muted">KSH {{ payment.amount }} • pending</small>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.85rem;">{{ payment.created_at|date:"M j" }}</small>
+                            </div>
+                        </div>
+                        {% empty %}
+                        {% if not failed_conversions %}
+                        <div class="text-center py-4 text-muted">
+                            <i class="bi bi-check2-circle" style="font-size: 2rem; opacity: 0.3; color: #10b981;"></i>
+                            <p class="mb-0 mt-2">All clear! No issues</p>
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+
+                        {% for conversion in failed_conversions %}
+                        <div class="list-group-item border-0 px-0 py-3" style="border-bottom: 1px solid #f1f5f9;">
+                            <div class="d-flex align-items-center">
+                                <div class="me-3" style="width: 40px; height: 40px; background: #fee2e2; border-radius: 10px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-x-circle" style="color: #ef4444;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-semibold" style="color: #1e293b; font-size: 0.95rem;">{{ conversion.original_pdf_filename }}</div>
+                                    <small class="text-muted">{{ conversion.error_message|default:"Failed conversion" }}</small>
+                                </div>
+                                <small class="text-muted" style="font-size: 0.85rem;">{{ conversion.created_at|date:"M j" }}</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Revision Materials Overview -->
+    <div class="row g-4">
+        <div class="col-12">
+            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-3" style="color: #1e293b;">
+                        <i class="bi bi-journal-bookmark" style="color: #10b981;"></i> Revision Materials
+                    </h5>
+                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Popular and recently added resources</p>
+                    
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <h6 class="fw-semibold mb-3" style="color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Top Materials</h6>
+                            {% for material in top_materials %}
+                            <div class="d-flex align-items-center py-2" style="border-bottom: 1px solid #f1f5f9;">
+                                <div class="me-3" style="width: 36px; height: 36px; background: #d1fae5; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-file-earmark-text" style="color: #10b981; font-size: 0.9rem;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium" style="color: #1e293b; font-size: 0.9rem;">{{ material.title }}</div>
+                                    <small class="text-muted">{{ material.download_count }} downloads</small>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted small">No materials yet.</p>
+                            {% endfor %}
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="fw-semibold mb-3" style="color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Newest Uploads</h6>
+                            {% for material in recent_materials %}
+                            <div class="d-flex align-items-center py-2" style="border-bottom: 1px solid #f1f5f9;">
+                                <div class="me-3" style="width: 36px; height: 36px; background: #eef2ff; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <i class="bi bi-file-earmark-plus" style="color: #667eea; font-size: 0.9rem;"></i>
+                                </div>
+                                <div class="flex-grow-1">
+                                    <div class="fw-medium" style="color: #1e293b; font-size: 0.9rem;">{{ material.title }}</div>
+                                    <small class="text-muted">{{ material.created_at|date:"M j, Y" }}</small>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <p class="text-muted small">Nothing added recently.</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.dashboard-shell {
+    animation: fadeIn 0.4s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card {
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1) !important;
+}
+
+.list-group-item {
+    transition: background-color 0.2s;
+}
+
+.list-group-item:hover {
+    background-color: #f8fafc;
+}
+</style>
+{% endblock %}

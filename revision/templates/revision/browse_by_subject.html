@@ -1,0 +1,96 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Browse by Subject{% endblock %}
+
+{% block heading %}Browse by Subject{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item"><a href="{% url 'revision_home' %}" style="color: var(--primary); text-decoration: none;">Revision Home</a></li>
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">All Subjects</li>
+{% endblock %}
+
+{% block content_body %}
+<!-- Header -->
+<div class="revision-section animate-fade-in">
+    <div class="d-flex align-items-center gap-2 mb-3">
+        <div class="revision-section-icon purple" style="width: 44px; height: 44px; font-size: 1.3rem; border-radius: var(--radius-sm);">
+            <i class="bi bi-book"></i>
+        </div>
+        <div>
+            <h4 class="fw-bold mb-0" style="color: var(--dark);">All Subjects</h4>
+            <p class="text-muted mb-0" style="font-size: 0.85rem;">{{ total_subjects }} subjects with available materials</p>
+        </div>
+    </div>
+    <a href="{% url 'browse_materials' %}" class="revision-btn revision-btn-secondary">
+        <i class="bi bi-funnel"></i> Browse with Filters
+    </a>
+</div>
+
+<!-- CBE Subjects -->
+{% if cbe_subjects %}
+<div class="revision-section animate-fade-in">
+    <div class="revision-section-header">
+        <div class="revision-section-icon purple"><i class="bi bi-mortarboard"></i></div>
+        <h3 class="revision-section-title">CBE Curriculum</h3>
+        <span class="revision-section-badge">{{ cbe_subjects|length }} subjects</span>
+    </div>
+
+    <div class="revision-card-grid">
+        {% for subject in cbe_subjects %}
+        <a href="{% url 'subject_materials' subject.id %}" class="revision-card">
+            <div class="revision-card-header">
+                <div class="revision-card-icon"><i class="bi bi-book"></i></div>
+                <div style="min-width: 0; flex: 1;">
+                    <div class="revision-card-title">{{ subject.name }}</div>
+                    <div class="revision-card-subtitle">{{ subject.class_ref.name }}</div>
+                </div>
+            </div>
+            <div class="revision-card-footer">
+                <span class="revision-badge type"><i class="bi bi-file-earmark"></i> {{ subject.material_count }} materials</span>
+                <i class="bi bi-chevron-right" style="color: var(--primary);"></i>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<!-- 8-4-4 Subjects -->
+{% if eight_four_subjects %}
+<div class="revision-section animate-fade-in">
+    <div class="revision-section-header">
+        <div class="revision-section-icon green"><i class="bi bi-bookmarks"></i></div>
+        <h3 class="revision-section-title">8-4-4 Curriculum</h3>
+        <span class="revision-section-badge">{{ eight_four_subjects|length }} subjects</span>
+    </div>
+
+    <div class="revision-card-grid">
+        {% for subject in eight_four_subjects %}
+        <a href="{% url 'subject_materials' subject.id %}" class="revision-card">
+            <div class="revision-card-header">
+                <div class="revision-card-icon"><i class="bi bi-book"></i></div>
+                <div style="min-width: 0; flex: 1;">
+                    <div class="revision-card-title">{{ subject.name }}</div>
+                    <div class="revision-card-subtitle">{{ subject.class_ref.name }}</div>
+                </div>
+            </div>
+            <div class="revision-card-footer">
+                <span class="revision-badge type"><i class="bi bi-file-earmark"></i> {{ subject.material_count }} materials</span>
+                <i class="bi bi-chevron-right" style="color: var(--success);"></i>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if not cbe_subjects and not eight_four_subjects %}
+<div class="revision-section animate-fade-in">
+    <div class="revision-empty" style="background: transparent; border: none; box-shadow: none;">
+        <div class="revision-empty-icon"><i class="bi bi-exclamation-triangle"></i></div>
+        <h6>No Subjects Available</h6>
+        <p>No subjects with materials found. Please check back later.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

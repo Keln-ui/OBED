@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Conversion History{% endblock %}
+
+{% block content %}
+<div class="text-center mb-5">
+    <h1 class="display-5 mb-3">Conversion History</h1>
+    <p class="lead text-muted">View your past document conversions</p>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Original File</th>
+                <th>Output Format</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% if conversions %}
+                {% for conversion in conversions %}
+                    <tr>
+                        <td>{{ conversion.original_pdf_filename }}</td>
+                        <td>
+                            <span class="badge bg-info">{{ conversion.get_output_format_display }}</span>
+                        </td>
+                        <td>
+                            {% if conversion.status == 'completed' %}
+                                <span class="badge bg-success">Completed</span>
+                            {% elif conversion.status == 'failed' %}
+                                <span class="badge bg-danger">Failed</span>
+                            {% else %}
+                                <span class="badge bg-warning">Processing</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ conversion.created_at|date:"M d, Y H:i" }}</td>
+                        <td>
+                            {% if conversion.status == 'completed' and conversion.converted_file %}
+                                <a href="{% url 'download_file' conversion.converted_file_filename %}" 
+                                   class="btn btn-sm btn-primary">
+                                    Download
+                                </a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No conversions found</td>
+                </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+<div class="text-center mt-4">
+    <a href="{% url 'index' %}" class="btn btn-outline-primary">Convert New File</a>
+</div>
+{% endblock %}

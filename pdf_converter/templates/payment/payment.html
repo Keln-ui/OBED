@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+
+{% block title %}Payment - Document Converter{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">Complete Payment</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-info">
+                    <h5 class="alert-heading">Conversion Summary</h5>
+                    <hr>
+                    <p class="mb-1"><strong>File:</strong> {{ conversion.original_pdf_filename }}</p>
+                    <p class="mb-1"><strong>Pages:</strong> {{ page_count }}</p>
+                    <p class="mb-1"><strong>Rate:</strong> KSH {{ cost_per_page }} per page</p>
+                    <p class="mb-0"><strong>Total:</strong> <span class="text-primary fw-bold">KSH {{ total_cost }}</span></p>
+                </div>
+
+                <form id="paymentForm" data-conversion-id="{{ conversion.id }}" data-total-cost="{{ total_cost }}">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="phoneNumber" class="form-label">M-Pesa Phone Number</label>
+                        <input type="tel" class="form-control" id="phoneNumber" 
+                               placeholder="254712345678" pattern="254[0-9]{9}" required>
+                        <div class="form-text">Enter your M-Pesa registered phone number (e.g., 254712345678)</div>
+                    </div>
+
+                    <div class="alert alert-warning">
+                        <strong>Note:</strong> You will receive an M-Pesa STK Push prompt on your phone. 
+                        Enter your M-Pesa PIN to complete the payment.
+                    </div>
+
+                    <button type="submit" class="btn btn-success w-100" id="payBtn">
+                        <i class="bi bi-phone"></i> Pay KSH {{ total_cost }} via M-Pesa
+                    </button>
+                </form>
+
+                <div id="paymentStatus" class="mt-3" style="display: none;">
+                    <div class="alert alert-info">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        <span id="statusMessage">Processing payment...</span>
+                    </div>
+                </div>
+
+                <div id="paymentError" class="mt-3" style="display: none;">
+                    <div class="alert alert-danger">
+                        <span id="errorMessage"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mt-3">
+            <div class="card-body">
+                <h6 class="card-title">How it works</h6>
+                <ol class="mb-0">
+                    <li>Enter your M-Pesa phone number</li>
+                    <li>Click "Pay via M-Pesa"</li>
+                    <li>Enter your M-Pesa PIN on your phone</li>
+                    <li>Download your converted file after payment</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const paymentForm = document.getElementById('paymentForm');
+const payBtn = document.getElementById('payBtn');
+const paymentStatus = document.getElementById('paymentStatus');
+const paymentError = document.getElementById('paymentError');
+const statusMessage = document.getElementById('statusMessage');
+const errorMessage = document.getElementById('errorMessage');
+
+const conversionId = parseInt(paymentForm.dataset.conversionId, 10);
+const totalCost = parseFloat(paymentForm.dataset.totalCost);
+
+paymentForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    
+    if (!phoneNumber || !phoneNumber.match(/^254[0-9]{9}$/)) {
+        showError('Please enter a valid M-Pesa phone number (e.g., 254712345678)');
+        return;
+    }
+    
+    payBtn.disabled = true;
+    payBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+    paymentStatus.style.display = 'block';
+    paymentError.style.display = 'none';
+    statusMessage.textContent = 'Initiating M-Pesa payment...';
+    
+    try {
+        const response = await fetch('/payment/initiate/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                conversion_id: conversionId,
+                phone_number: phoneNumber
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            statusMessage.textContent = data.message || 'Payment initiated. Please check your phone.';
+            
+            // Start polling for payment status
+            pollPaymentStatus(data.payment_id);
+        } else {
+            showError(data.error || 'Payment initiation failed');
+            payBtn.disabled = false;
+            payBtn.innerHTML = '<i class="bi bi-phone"></i> Pay KSH ' + totalCost + ' via M-Pesa';
+            paymentStatus.style.display = 'none';
+        }
+    } catch (error) {
+        showError('An error occurred. Please try again.');
+        payBtn.disabled = false;
+        payBtn.innerHTML = '<i class="bi bi-phone"></i> Pay KSH ' + totalCost + ' via M-Pesa';
+        paymentStatus.style.display = 'none';
+    }
+});
+
+async function pollPaymentStatus(paymentId) {
+    const maxAttempts = 30; // 5 minutes (10 second intervals)
+    let attempts = 0;
+    
+    const interval = setInterval(async () => {
+        attempts++;
+        
+        try {
+            const response = await fetch('/payment/status/' + paymentId + '/');
+            const data = await response.json();
+            
+            if (data.status === 'completed') {
+                clearInterval(interval);
+                statusMessage.textContent = 'Payment successful! Redirecting...';
+                setTimeout(() => {
+                    window.location.href = '/payment/success/' + conversionId + '/';
+                }, 1500);
+            } else if (data.status === 'failed') {
+                clearInterval(interval);
+                showError('Payment failed. Please try again.');
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="bi bi-phone"></i> Pay KSH ' + totalCost + ' via M-Pesa';
+                paymentStatus.style.display = 'none';
+            } else if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                showError('Payment timeout. Please check your M-Pesa messages or try again.');
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="bi bi-phone"></i> Pay KSH ' + totalCost + ' via M-Pesa';
+                paymentStatus.style.display = 'none';
+            } else {
+                statusMessage.textContent = 'Waiting for payment... (' + (attempts * 10) + 's)';
+            }
+        } catch (error) {
+            if (attempts >= maxAttempts) {
+                clearInterval(interval);
+                showError('Unable to verify payment status. Please check your M-Pesa messages.');
+                payBtn.disabled = false;
+                payBtn.innerHTML = '<i class="bi bi-phone"></i> Pay KSH ' + totalCost + ' via M-Pesa';
+                paymentStatus.style.display = 'none';
+            }
+        }
+    }, 10000); // Poll every 10 seconds
+}
+
+function showError(message) {
+    errorMessage.textContent = message;
+    paymentError.style.display = 'block';
+}
+</script>
+{% endblock %}

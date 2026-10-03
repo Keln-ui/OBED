@@ -1,0 +1,94 @@
+{% extends 'revision/base_revision.html' %}
+
+{% block subtitle %}Generate Marking Scheme{% endblock %}
+
+{% block heading %}
+    <span><i class="bi bi-check2-square" style="color: var(--primary);"></i> Generate Marking Scheme</span>
+{% endblock %}
+
+{% block breadcrumb %}
+    <li class="breadcrumb-item active" style="color: var(--gray-400);">Generate Marking Scheme</li>
+{% endblock %}
+
+{% block content_body %}
+<div class="revision-section animate-fade-in">
+    <p class="text-muted mb-4">Create a new marking scheme text file directly in the system. The generated file will be saved as a revision material and can be linked to a past paper.</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form.subject.label_tag }}
+                    {{ form.subject|as_widget(attrs={'class': 'form-select'}) }}
+                    {{ form.subject.errors }}
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="mb-3">
+                    {{ form.title.label_tag }}
+                    {{ form.title|as_widget(attrs={'class': 'form-control'}) }}
+                    {{ form.title.errors }}
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="mb-3">
+                    {{ form.term.label_tag }}
+                    {{ form.term|as_widget(attrs={'class': 'form-select'}) }}
+                    {{ form.term.errors }}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="mb-3">
+                    {{ form.year.label_tag }}
+                    {{ form.year|as_widget(attrs={'class': 'form-control'}) }}
+                    {{ form.year.errors }}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-check mt-4 pt-1">
+                    {{ form.is_free }}
+                    {{ form.is_free.label_tag }}
+                    <div class="form-text">{{ form.is_free.help_text }}</div>
+                    {{ form.is_free.errors }}
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-3">
+            {{ form.price.label_tag }}
+            {{ form.price|as_widget(attrs={'class': 'form-control'}) }}
+            <div class="form-text">{{ form.price.help_text }}</div>
+            {{ form.price.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.description.label_tag }}
+            {{ form.description|as_widget(attrs={'class': 'form-control'}) }}
+            {{ form.description.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.related_material.label_tag }}
+            {{ form.related_material|as_widget(attrs={'class': 'form-select'}) }}
+            <div class="form-text">{{ form.related_material.help_text }}</div>
+            {{ form.related_material.errors }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.rubric_text.label_tag }}
+            {{ form.rubric_text|as_widget(attrs={'class': 'form-control'}) }}
+            <div class="form-text">{{ form.rubric_text.help_text }}</div>
+            {{ form.rubric_text.errors }}
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{% url 'revision_home' %}" class="revision-btn revision-btn-secondary">Cancel</a>
+            <button type="submit" class="revision-btn revision-btn-primary">Generate Marking Scheme</button>
+        </div>
+    </form>
+</div>
+{% endblock %}

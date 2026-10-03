@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account - Core Synch Solutions{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card border-0 shadow-sm" style="border-radius: 20px;">
+                <div class="card-body p-4 p-lg-5">
+                    <div class="text-center mb-4">
+                        <div style="width: 64px; height: 64px; border-radius: 16px; background: linear-gradient(135deg, #6366f1, #8b5cf6); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem;">
+                            <i class="bi bi-person-plus-fill text-white" style="font-size: 1.5rem;"></i>
+                        </div>
+                        <h4 class="fw-bold" style="color: #0f172a;">Create Your Account</h4>
+                        <p class="text-muted" style="font-size: 0.9rem;">Sign up to download marking schemes and access all features</p>
+                    </div>
+
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-3">
+                            <label class="form-label fw-medium" style="font-size: 0.9rem; color: #0f172a;">Username <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control form-control-lg" name="username" placeholder="Choose a username" required
+                                   style="border-radius: 12px; border-color: #e2e8f0;">
+                            {% if form.username.errors %}
+                                <div class="text-danger small mt-1">{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium" style="font-size: 0.9rem; color: #0f172a;">Email <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control form-control-lg" name="email" placeholder="your@email.com" required
+                                   style="border-radius: 12px; border-color: #e2e8f0;">
+                            {% if form.email.errors %}
+                                <div class="text-danger small mt-1">{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-medium" style="font-size: 0.9rem; color: #0f172a;">Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control form-control-lg" name="password1" placeholder="Create a password" required
+                                   style="border-radius: 12px; border-color: #e2e8f0;">
+                            {% if form.password1.errors %}
+                                <div class="text-danger small mt-1">{{ form.password1.errors.0 }}</div>
+                            {% endif %}
+                            <div class="text-muted small mt-1">At least 8 characters. Not entirely numeric.</div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="form-label fw-medium" style="font-size: 0.9rem; color: #0f172a;">Confirm Password <span class="text-danger">*</span></label>
+                            <input type="password" class="form-control form-control-lg" name="password2" placeholder="Confirm password" required
+                                   style="border-radius: 12px; border-color: #e2e8f0;">
+                            {% if form.password2.errors %}
+                                <div class="text-danger small mt-1">{{ form.password2.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-lg w-100 py-3" 
+                                style="background: linear-gradient(135deg, #6366f1, #8b5cf6); border: none; color: #fff; border-radius: 12px; font-weight: 600;">
+                            <i class="bi bi-person-plus"></i> Create Account
+                        </button>
+                    </form>
+
+                    <div class="text-center mt-4">
+                        <p class="text-muted mb-0" style="font-size: 0.9rem;">
+                            Already have an account? 
+                            <a href="{% url 'login' %}" style="color: #6366f1; text-decoration: none; font-weight: 500;">Sign In</a>
+                        </p>
+                        <p class="mt-2" style="font-size: 0.85rem;">
+                            <a href="{% url 'school_register' %}" style="color: #6366f1; text-decoration: none;">
+                                <i class="bi bi-building"></i> Register a School instead
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
