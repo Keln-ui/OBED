@@ -231,3 +231,51 @@ class PaymentSettings(models.Model):
     def get_active_settings():
         settings_obj, _ = PaymentSettings.objects.get_or_create(pk=1)
         return settings_obj
+
+
+# ---------------------------------------------------------------------------
+# JOB ADVERTISEMENTS
+# ---------------------------------------------------------------------------
+class JobAdvertisement(models.Model):
+    """Job advertisements for BOM and Homeschooling positions"""
+    JOB_TYPE_CHOICES = [
+        ('bom', 'BOM Teaching Job'),
+        ('homeschooling', 'Homeschooling Job'),
+    ]
+    
+    EMPLOYMENT_TYPE_CHOICES = [
+        ('full-time', 'Full-time'),
+        ('part-time', 'Part-time'),
+        ('contract', 'Contract'),
+    ]
+    
+    job_type = models.CharField(max_length=20, choices=JOB_TYPE_CHOICES)
+    employment_type = models.CharField(max_length=20, choices=EMPLOYMENT_TYPE_CHOICES, default='full-time')
+    title = models.CharField(max_length=200)
+    school_name = models.CharField(max_length=200)
+    location = models.CharField(max_length=100)
+    description = models.TextField()
+    requirements = models.TextField(help_text="List job requirements (one per line)")
+    salary_range = models.CharField(max_length=100, help_text="e.g. Ksh 35,000 - 45,000/month")
+    contact_email = models.EmailField()
+    contact_phone = models.CharField(max_length=20, blank=True)
+    is_active = models.BooleanField(default=True)
+    approved = models.BooleanField(default=False, help_text="Job must be approved by admin to appear on website")
+    featured = models.BooleanField(default=False, help_text="Featured jobs appear first in rotation")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    expires_at = models.DateField(null=True, blank=True, help_text="Job posting expiry date")
+    
+    class Meta:
+        ordering = ['-featured', '-created_at']
+        verbose_name = 'Job Advertisement'
+        verbose_name_plural = 'Job Advertisements'
+    
+    def __str__(self):
+        return f"{self.title} - {self.school_name}"
+    
+    def is_expired(self):
+        """Check if job posting has expired"""
+        if self.expires_at:
+            return self.expires_at < __import__('datetime').date.today()
+        return False

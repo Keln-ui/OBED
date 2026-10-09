@@ -38,7 +38,15 @@ urlpatterns = [
     # School Registration & Subscription
     path('register/', views.school_register, name='school_register'),
     path('register/user/', views.user_register, name='user_register'),
+    path('verify-email/<uidb64>/<token>/', views.verify_email, name='verify_email'),
     path('subscription/plans/', views.subscription_plans, name='subscription_plans'),
+    
+    # Job Listings
+    path('jobs/bom/', views.bom_jobs, name='bom_jobs'),
+    path('jobs/homeschooling/', views.homeschooling_jobs, name='homeschooling_jobs'),
+    path('jobs/post/', views.post_job, name='post_job'),
+    path('manage-jobs/', views.admin_job_approvals, name='admin_job_approvals'),
+    
     path('subscription/subscribe/<int:plan_id>/', views.subscribe_plan, name='subscribe_plan'),
     path('profile/', views.user_profile, name='user_profile'),
     path('profile/edit/', views.edit_profile, name='edit_profile'),

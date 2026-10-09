@@ -73,7 +73,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': os.environ.get('MYSQL_DATABASE', 'word_converter'),
         'USER': os.environ.get('MYSQL_USER', 'root'),
-        'PASSWORD': os.environ.get('MYSQL_PASSWORD', ''),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'Kevin@1143'),
         'HOST': os.environ.get('MYSQL_HOST', '127.0.0.1'),
         'PORT': os.environ.get('MYSQL_PORT', '3306'),
         'OPTIONS': {
@@ -154,10 +154,10 @@ for path in TESSERACT_PATHS:
         break
 
 # IntaSend Payment Configuration
-INTASEND_PUBLISHABLE_KEY = 'ISPubKey_live_e6dec2e9-403d-477a-b4aa-17883ea14431'
-INTASEND_SECRET_KEY = 'ISSecretKey_live_7ab03888-98a8-4a46-83c0-80a6db88f72c'
+INTASEND_PUBLISHABLE_KEY = ''  # Empty to use demo mode
+INTASEND_SECRET_KEY = ''  # Empty to use demo mode
 INTASEND_CALLBACK_URL = 'https://your-ngrok-url.ngrok-free.app/payment/callback/'
-INTASEND_ENVIRONMENT = 'live'  # Live mode with live credentials
+INTASEND_ENVIRONMENT = 'sandbox'  # Sandbox mode
 
 # CSRF and Session Configuration
 CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
@@ -167,10 +167,12 @@ SESSION_COOKIE_HTTPONLY = True
 CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000', 'https://*.ngrok-free.app', 'https://*.ngrok.io']
 
 # Email Configuration for Password Reset
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'  # Sends emails via SMTP
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = 465
+EMAIL_USE_SSL = True
+EMAIL_USE_TLS = False
 EMAIL_HOST_USER = 'jomokelvin1143@gmail.com'
-EMAIL_HOST_PASSWORD = 'acex nsmz gfts zlso'
+EMAIL_HOST_PASSWORD = 'avwc puzj kelm obpe'
 DEFAULT_FROM_EMAIL = 'jomokelvin1143@gmail.com'
+EMAIL_TIMEOUT = 30

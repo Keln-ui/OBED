@@ -1,9 +1,12 @@
 import os
 import shutil
 import tempfile
+import logging
 from pathlib import Path
 from io import BytesIO
 from datetime import datetime, date, timedelta
+
+logger = logging.getLogger(__name__)
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse, HttpResponse, FileResponse
@@ -17,7 +20,7 @@ from django.urls import reverse
 from PyPDF2 import PdfMerger, PdfReader, PdfWriter
 from .models import (
     ConvertedFile, Payment, 
-    SchoolProfile, SubscriptionPlan, SchoolSubscription, SubscriptionPayment
+    SchoolProfile, SubscriptionPlan, SchoolSubscription, SubscriptionPayment, JobAdvertisement
 )
 from .forms import SchoolRegistrationForm, SubscriptionPaymentForm
 from .payment_utils import get_conversion_cost, payment_required_for_conversion
@@ -63,11 +66,21 @@ def index(request):
     from revision.models import RevisionMaterial, Class as SchoolClass
     total_materials = RevisionMaterial.objects.count()
     total_classes = SchoolClass.objects.count()
+    
+    # Get active job advertisements for homepage carousel (only approved jobs)
+    featured_jobs = JobAdvertisement.objects.filter(
+        is_active=True,
+        approved=True
+    ).exclude(
+        expires_at__lt=date.today()
+    ).order_by('-featured', '-created_at')[:6]
+    
     context = {
         'plans': SubscriptionPlan.objects.filter(is_active=True),
         'total_formats': 7,
         'total_materials': total_materials,
         'total_classes': total_classes,
+        'featured_jobs': featured_jobs,
     }
     return render(request, 'index.html', context)
 
@@ -85,27 +98,83 @@ def logout_view(request):
 # USER REGISTRATION (simple account for marking scheme downloads)
 # ---------------------------------------------------------------------------
 def user_register(request):
-    """Register a simple user account (not a school)."""
+    """Register a simple user account (not a school) with email verification."""
     from django.contrib.auth.forms import UserCreationForm
+    from django.contrib.auth.tokens import default_token_generator
+    from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+    from django.utils.encoding import force_bytes, force_str
+    from django.core.mail import send_mail
+    from django.template.loader import render_to_string
+    from django.conf import settings
+    from django.contrib.sites.shortcuts import get_current_site
     
     if request.method == 'POST':
         form = UserCreationForm(request.POST)
         if form.is_valid():
-            user = form.save()
+            user = form.save(commit=False)
             user.email = form.cleaned_data.get('email', '')
+            user.is_active = False  # User must verify email before activation
             user.save()
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password1']
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-            messages.success(request, f'Welcome {username}! Your account has been created. You can now download marking schemes.')
-            next_url = request.GET.get('next', 'index')
-            return redirect(next_url)
+            
+            # Generate verification token
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            
+            # Build verification URL
+            current_site = get_current_site(request)
+            verification_url = f"http://{current_site.domain}/verify-email/{uid}/{token}/"
+            
+            # Send verification email
+            subject = 'Verify your CoreSynch account'
+            message = render_to_string('registration/verification_email.html', {
+                'user': user,
+                'verification_url': verification_url,
+                'domain': current_site.domain,
+            })
+            
+            try:
+                send_mail(
+                    subject,
+                    message,
+                    settings.DEFAULT_FROM_EMAIL,
+                    [user.email],
+                    fail_silently=False,
+                    html_message=message,
+                )
+                messages.success(request, f'Registration successful! A verification email has been sent to {user.email}. Please check your inbox to activate your account.')
+                return redirect('login')
+            except Exception as e:
+                messages.error(request, f'Failed to send verification email: {str(e)}')
+                user.delete()  # Delete user if email fails
+                return redirect('user_register')
     else:
         form = UserCreationForm()
     
     return render(request, 'registration/user_register.html', {'form': form})
+
+
+def verify_email(request, uidb64, token):
+    """Verify user email with token."""
+    from django.contrib.auth.tokens import default_token_generator
+    from django.utils.http import urlsafe_base64_decode
+    from django.utils.encoding import force_str
+    from django.contrib.auth import login
+    
+    try:
+        uid = force_str(urlsafe_base64_decode(uidb64))
+        user = User.objects.get(pk=uid)
+    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+        user = None
+    
+    if user is not None and default_token_generator.check_token(user, token):
+        user.is_active = True
+        user.save()
+        login(request, user)
+        messages.success(request, 'Your email has been verified! Your account is now active.')
+        return redirect('index')
+    else:
+        messages.error(request, 'Invalid verification link or link has expired.')
+        return redirect('login')
 
 
 # ---------------------------------------------------------------------------
@@ -354,8 +423,9 @@ def upload_pdf(request):
         converter = factory.get_converter(str(input_path), str(output_path), output_format, use_ocr)
         
         if converter and converter.convert():
-            # Save the converted file
-            conversion.converted_file.name = f'converted/{output_filename}'
+            # Save the converted file to Django's file field
+            with open(output_path, 'rb') as f:
+                conversion.converted_file.save(f'converted/{output_filename}', f, save=False)
             conversion.status = 'completed'
             if not requires_payment:
                 conversion.payment_status = 'paid'
@@ -384,7 +454,7 @@ def upload_pdf(request):
     return JsonResponse({
         'success': True,
         'payment_required': requires_payment,
-        'download_url': download_url if not requires_payment else None,
+        'download_url': download_url,
         'filename': output_filename,
         'page_count': page_count,
         'total_cost': float(total_cost),
@@ -395,7 +465,14 @@ def upload_pdf(request):
 def download_file(request, filename):
     """Download a converted file (paid or free)."""
     import os
+    from django.core.files.storage import default_storage
+    
+    logger.info(f"Download requested for filename: {filename}")
+    
+    # Try direct file path first
     file_path = os.path.join(settings.MEDIA_ROOT, 'converted', filename)
+    logger.info(f"Checking direct file path: {file_path}, exists: {os.path.exists(file_path)}")
+    
     if os.path.exists(file_path):
         ext = os.path.splitext(filename)[1].lower()
         content_types = {
@@ -410,15 +487,59 @@ def download_file(request, filename):
             '.zip': 'application/zip',
         }
         content_type = content_types.get(ext, 'application/octet-stream')
-        response = FileResponse(open(file_path, 'rb'), content_type=content_type)
-        response['Content-Disposition'] = f'attachment; filename="{filename}"'
-        return response
+        try:
+            response = FileResponse(open(file_path, 'rb'), content_type=content_type)
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            logger.info(f"Successfully serving file from direct path: {file_path}")
+            return response
+        except Exception as e:
+            logger.error(f"Error serving file {file_path}: {str(e)}")
+    
+    # Try Django storage
+    storage_path = f'converted/{filename}'
+    logger.info(f"Checking storage path: {storage_path}, exists: {default_storage.exists(storage_path)}")
+    if default_storage.exists(storage_path):
+        try:
+            response = FileResponse(default_storage.open(storage_path, 'rb'), content_type='application/octet-stream')
+            response['Content-Disposition'] = f'attachment; filename="{filename}"'
+            logger.info(f"Successfully serving file from storage: {storage_path}")
+            return response
+        except Exception as e:
+            logger.error(f"Error serving file from storage {storage_path}: {str(e)}")
     
     # Fall back to paid conversion records
-    conversion = get_object_or_404(ConvertedFile, converted_file__endswith=filename)
-    if payment_required_for_conversion() and conversion.payment_status != 'paid':
-        return redirect(f'/payment/{conversion.id}/')
-    return redirect(conversion.converted_file.url)
+    try:
+        # Try to find conversion by exact filename match
+        conversion = ConvertedFile.objects.filter(converted_file__endswith=filename).first()
+        logger.info(f"Found conversion by exact match: {conversion}")
+        if not conversion:
+            # Try with just the base name
+            base_name = os.path.splitext(filename)[0]
+            conversion = ConvertedFile.objects.filter(converted_file__icontains=base_name).first()
+            logger.info(f"Found conversion by base name: {conversion}")
+        
+        if conversion:
+            logger.info(f"Conversion payment_status: {conversion.payment_status}, payment_required: {payment_required_for_conversion()}")
+            # Only redirect to payment if payment is required AND conversion is not already paid
+            if payment_required_for_conversion() and conversion.payment_status != 'paid':
+                logger.info(f"Redirecting to payment for conversion {conversion.id}")
+                return redirect(f'/payment/{conversion.id}/')
+            
+            # Try to serve from the model's file field
+            if conversion.converted_file and conversion.converted_file.storage.exists(conversion.converted_file.name):
+                logger.info(f"Serving from model file field: {conversion.converted_file.name}")
+                response = FileResponse(conversion.converted_file.open('rb'), content_type='application/octet-stream')
+                response['Content-Disposition'] = f'attachment; filename="{filename}"'
+                return response
+            else:
+                logger.error(f"Model file field does not exist: {conversion.converted_file.name if conversion.converted_file else 'None'}")
+    except Exception as e:
+        logger.error(f"Error looking up conversion: {str(e)}")
+    
+    # If all else fails, return error
+    from django.http import HttpResponseNotFound
+    logger.error(f"File not available after all attempts: {filename}")
+    return HttpResponseNotFound("File not available on site. Please contact support if this issue persists.")
 
 
 # ---------------------------------------------------------------------------
@@ -1482,6 +1603,7 @@ def custom_password_reset(request):
             form.save(
                 subject_template_name='registration/password_reset_subject.txt',
                 email_template_name='registration/password_reset_email.html',
+                html_email_template_name='registration/password_reset_email.html',
                 request=request,
             )
             messages.success(request, 'Password reset link has been sent to your email.')
@@ -1526,6 +1648,109 @@ def login_view(request):
     form = AuthenticationForm()
     
     return render(request, 'registration/login.html', {'form': form})
+
+
+# ---------------------------------------------------------------------------
+# JOB LISTINGS
+# ---------------------------------------------------------------------------
+def bom_jobs(request):
+    """BOM Teaching Jobs listing page."""
+    return render(request, 'jobs/bom_jobs.html')
+
+
+def homeschooling_jobs(request):
+    """Homeschooling Jobs listing page."""
+    return render(request, 'jobs/homeschooling_jobs.html')
+
+
+def post_job(request):
+    """Post a new job advertisement."""
+    from .models import JobAdvertisement
+    from datetime import datetime
+    
+    if request.method == 'POST':
+        job_type = request.POST.get('job_type')
+        employment_type = request.POST.get('employment_type', 'full-time')
+        title = request.POST.get('title')
+        school_name = request.POST.get('school_name')
+        location = request.POST.get('location')
+        description = request.POST.get('description')
+        requirements = request.POST.get('requirements')
+        salary_range = request.POST.get('salary_range')
+        contact_email = request.POST.get('contact_email')
+        contact_phone = request.POST.get('contact_phone', '')
+        expires_at = request.POST.get('expires_at')
+        featured = request.POST.get('featured') == 'on'
+        
+        if job_type and title and school_name and location:
+            job = JobAdvertisement.objects.create(
+                job_type=job_type,
+                employment_type=employment_type,
+                title=title,
+                school_name=school_name,
+                location=location,
+                description=description,
+                requirements=requirements,
+                salary_range=salary_range,
+                contact_email=contact_email,
+                contact_phone=contact_phone,
+                expires_at=datetime.strptime(expires_at, '%Y-%m-%d').date() if expires_at else None,
+                featured=featured,
+                approved=False  # Jobs require admin approval
+            )
+            messages.success(request, 'Job advertisement submitted successfully! It will be reviewed by admin before appearing on the website.')
+            return redirect('index')
+        else:
+            messages.error(request, 'Please fill in all required fields.')
+    
+    return render(request, 'jobs/post_job.html')
+
+
+@login_required
+def admin_job_approvals(request):
+    """Admin view to approve/reject job advertisements."""
+    from .models import JobAdvertisement
+    from django.contrib.auth.decorators import user_passes_test
+    
+    # Only superusers can access this
+    if not request.user.is_superuser:
+        messages.error(request, 'You do not have permission to access this page.')
+        return redirect('index')
+    
+    pending_jobs = JobAdvertisement.objects.filter(approved=False, is_active=True).order_by('-created_at')
+    approved_jobs = JobAdvertisement.objects.filter(approved=True, is_active=True).order_by('-created_at')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        job_id = request.POST.get('job_id')
+        
+        if action == 'approve' and job_id:
+            job = JobAdvertisement.objects.get(id=job_id)
+            job.approved = True
+            job.save()
+            messages.success(request, f'Job "{job.title}" has been approved.')
+        elif action == 'reject' and job_id:
+            job = JobAdvertisement.objects.get(id=job_id)
+            job.is_active = False
+            job.save()
+            messages.success(request, f'Job "{job.title}" has been rejected.')
+        elif action == 'toggle_featured' and job_id:
+            job = JobAdvertisement.objects.get(id=job_id)
+            job.featured = not job.featured
+            job.save()
+            messages.success(request, f'Job "{job.title}" featured status updated.')
+        elif action == 'delete' and job_id:
+            job = JobAdvertisement.objects.get(id=job_id)
+            job.delete()
+            messages.success(request, f'Job "{job.title}" has been deleted.')
+        
+        return redirect('admin_job_approvals')
+    
+    context = {
+        'pending_jobs': pending_jobs,
+        'approved_jobs': approved_jobs,
+    }
+    return render(request, 'admin/job_approvals.html', context)
 
 
 @login_required

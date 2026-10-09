@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Job Approvals - Admin{% endblock %}
+
+{% block content %}
+<section class="admin-header-new">
+  <div class="container">
+    <h1 class="admin-heading-new">Job Advertisement Approvals</h1>
+    <p class="admin-subheading-new">Review and manage job submissions</p>
+  </div>
+</section>
+
+<section class="admin-content-new">
+  <div class="container">
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- Pending Jobs -->
+    <div class="admin-section-new">
+      <h2 class="admin-section-heading-new">
+        <i class="bi bi-clock-history"></i> Pending Approvals ({{ pending_jobs|length }})
+      </h2>
+      
+      {% if pending_jobs %}
+        <div class="admin-jobs-grid-new">
+          {% for job in pending_jobs %}
+            <div class="admin-job-card-new">
+              <div class="admin-job-header-new">
+                <span class="admin-job-type-new {% if job.job_type == 'bom' %}type-bom{% else %}type-homeschool{% endif %}">
+                  {% if job.job_type == 'bom' %}BOM Job{% else %}Homeschooling{% endif %}
+                </span>
+                <span class="admin-job-date-new">{{ job.created_at|date:"M d, Y" }}</span>
+              </div>
+              
+              <h3 class="admin-job-title-new">{{ job.title }}</h3>
+              <p class="admin-job-school-new">{{ job.school_name }}</p>
+              
+              <div class="admin-job-details-new">
+                <div class="admin-job-detail-new">
+                  <i class="bi bi-geo-alt"></i>
+                  <span>{{ job.location }}</span>
+                </div>
+                <div class="admin-job-detail-new">
+                  <i class="bi bi-cash-stack"></i>
+                  <span>{{ job.salary_range }}</span>
+                </div>
+                <div class="admin-job-detail-new">
+                  <i class="bi bi-clock"></i>
+                  <span>{{ job.get_employment_type_display }}</span>
+                </div>
+              </div>
+              
+              <div class="admin-job-desc-new">
+                <strong>Description:</strong>
+                <p>{{ job.description|truncatewords:30 }}</p>
+              </div>
+              
+              <div class="admin-job-requirements-new">
+                <strong>Requirements:</strong>
+                <p>{{ job.requirements|truncatewords:30 }}</p>
+              </div>
+              
+              <div class="admin-job-contact-new">
+                <strong>Contact:</strong>
+                <a href="mailto:{{ job.contact_email }}">{{ job.contact_email }}</a>
+                {% if job.contact_phone %}
+                  <span>• {{ job.contact_phone }}</span>
+                {% endif %}
+              </div>
+              
+              <div class="admin-job-actions-new">
+                <form method="post" action="{% url 'admin_job_approvals' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="job_id" value="{{ job.id }}">
+                  <button type="submit" name="action" value="approve" class="btn-admin-approve-new">
+                    <i class="bi bi-check-circle"></i> Approve
+                  </button>
+                  <button type="submit" name="action" value="reject" class="btn-admin-reject-new">
+                    <i class="bi bi-x-circle"></i> Reject
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="admin-empty-new">
+          <i class="bi bi-inbox"></i>
+          <p>No pending job approvals</p>
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- Approved Jobs -->
+    <div class="admin-section-new">
+      <h2 class="admin-section-heading-new">
+        <i class="bi bi-check-circle"></i> Approved Jobs ({{ approved_jobs|length }})
+      </h2>
+      
+      {% if approved_jobs %}
+        <div class="admin-jobs-grid-new">
+          {% for job in approved_jobs %}
+            <div class="admin-job-card-new admin-job-approved-new">
+              <div class="admin-job-header-new">
+                <span class="admin-job-type-new {% if job.job_type == 'bom' %}type-bom{% else %}type-homeschool{% endif %}">
+                  {% if job.job_type == 'bom' %}BOM Job{% else %}Homeschooling{% endif %}
+                </span>
+                <div class="admin-job-badges-new">
+                  {% if job.featured %}
+                    <span class="admin-badge-featured-new"><i class="bi bi-star-fill"></i> Featured</span>
+                  {% endif %}
+                  <span class="admin-badge-approved-new"><i class="bi bi-check-circle"></i> Approved</span>
+                </div>
+              </div>
+              
+              <h3 class="admin-job-title-new">{{ job.title }}</h3>
+              <p class="admin-job-school-new">{{ job.school_name }}</p>
+              
+              <div class="admin-job-details-new">
+                <div class="admin-job-detail-new">
+                  <i class="bi bi-geo-alt"></i>
+                  <span>{{ job.location }}</span>
+                </div>
+                <div class="admin-job-detail-new">
+                  <i class="bi bi-cash-stack"></i>
+                  <span>{{ job.salary_range }}</span>
+                </div>
+              </div>
+              
+              <div class="admin-job-actions-new">
+                <form method="post" action="{% url 'admin_job_approvals' %}">
+                  {% csrf_token %}
+                  <input type="hidden" name="job_id" value="{{ job.id }}">
+                  <button type="submit" name="action" value="toggle_featured" class="btn-admin-toggle-new">
+                    <i class="bi bi-star"></i> {% if job.featured %}Unfeature{% else %}Feature{% endif %}
+                  </button>
+                  <button type="submit" name="action" value="delete" class="btn-admin-delete-new">
+                    <i class="bi bi-trash"></i> Delete
+                  </button>
+                </form>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <div class="admin-empty-new">
+          <i class="bi bi-inbox"></i>
+          <p>No approved jobs yet</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+{% endblock %}

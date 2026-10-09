@@ -3,65 +3,69 @@
 {% block title %}Payment - Document Converter{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-lg-6 mx-auto">
-        <div class="card">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">Complete Payment</h5>
-            </div>
-            <div class="card-body">
-                <div class="alert alert-info">
-                    <h5 class="alert-heading">Conversion Summary</h5>
-                    <hr>
-                    <p class="mb-1"><strong>File:</strong> {{ conversion.original_pdf_filename }}</p>
-                    <p class="mb-1"><strong>Pages:</strong> {{ page_count }}</p>
-                    <p class="mb-1"><strong>Rate:</strong> KSH {{ cost_per_page }} per page</p>
-                    <p class="mb-0"><strong>Total:</strong> <span class="text-primary fw-bold">KSH {{ total_cost }}</span></p>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="bi bi-credit-card me-2"></i>Complete Payment</h5>
                 </div>
-
-                <form id="paymentForm" data-conversion-id="{{ conversion.id }}" data-total-cost="{{ total_cost }}">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="phoneNumber" class="form-label">M-Pesa Phone Number</label>
-                        <input type="tel" class="form-control" id="phoneNumber" 
-                               placeholder="254712345678" pattern="254[0-9]{9}" required>
-                        <div class="form-text">Enter your M-Pesa registered phone number (e.g., 254712345678)</div>
-                    </div>
-
-                    <div class="alert alert-warning">
-                        <strong>Note:</strong> You will receive an M-Pesa STK Push prompt on your phone. 
-                        Enter your M-Pesa PIN to complete the payment.
-                    </div>
-
-                    <button type="submit" class="btn btn-success w-100" id="payBtn">
-                        <i class="bi bi-phone"></i> Pay KSH {{ total_cost }} via M-Pesa
-                    </button>
-                </form>
-
-                <div id="paymentStatus" class="mt-3" style="display: none;">
+                <div class="card-body">
                     <div class="alert alert-info">
-                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
-                        <span id="statusMessage">Processing payment...</span>
+                        <h5 class="alert-heading"><i class="bi bi-file-earmark-text me-2"></i>Conversion Summary</h5>
+                        <hr>
+                        <p class="mb-1"><strong>File:</strong> {{ conversion.original_pdf_filename }}</p>
+                        <p class="mb-1"><strong>Pages:</strong> {{ page_count }}</p>
+                        <p class="mb-1"><strong>Rate:</strong> KSH {{ cost_per_page }} per page</p>
+                        <p class="mb-0"><strong>Total:</strong> <span class="text-primary fw-bold fs-5">KSH {{ total_cost }}</span></p>
                     </div>
-                </div>
 
-                <div id="paymentError" class="mt-3" style="display: none;">
-                    <div class="alert alert-danger">
-                        <span id="errorMessage"></span>
+                    <form id="paymentForm" data-conversion-id="{{ conversion.id }}" data-total-cost="{{ total_cost }}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="phoneNumber" class="form-label fw-bold">M-Pesa Phone Number</label>
+                            <input type="tel" class="form-control form-control-lg" id="phoneNumber" 
+                                   placeholder="254712345678" pattern="254[0-9]{9}" required>
+                            <div class="form-text">Enter your M-Pesa registered phone number (e.g., 254712345678)</div>
+                        </div>
+
+                        <div class="alert alert-warning">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Note:</strong> You will receive an M-Pesa STK Push prompt on your phone. 
+                            Enter your M-Pesa PIN to complete the payment.
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 btn-lg" id="payBtn">
+                            <i class="bi bi-phone me-2"></i> Pay KSH {{ total_cost }} via M-Pesa
+                        </button>
+                    </form>
+
+                    <div id="paymentStatus" class="mt-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                            <span id="statusMessage">Processing payment...</span>
+                        </div>
+                    </div>
+
+                    <div id="paymentError" class="mt-3" style="display: none;">
+                        <div class="alert alert-danger">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <span id="errorMessage"></span>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <div class="card mt-3">
-            <div class="card-body">
-                <h6 class="card-title">How it works</h6>
-                <ol class="mb-0">
-                    <li>Enter your M-Pesa phone number</li>
-                    <li>Click "Pay via M-Pesa"</li>
-                    <li>Enter your M-Pesa PIN on your phone</li>
-                    <li>Download your converted file after payment</li>
-                </ol>
+            <div class="card mt-3 shadow-sm">
+                <div class="card-body">
+                    <h6 class="card-title"><i class="bi bi-question-circle me-2"></i>How it works</h6>
+                    <ol class="mb-0 ps-3">
+                        <li>Enter your M-Pesa phone number</li>
+                        <li>Click "Pay via M-Pesa"</li>
+                        <li>Enter your M-Pesa PIN on your phone</li>
+                        <li>Download your converted file after payment</li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>

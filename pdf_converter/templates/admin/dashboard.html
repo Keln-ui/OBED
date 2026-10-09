@@ -3,131 +3,122 @@
 {% block title %}Admin Dashboard - Core Synch Solutions{% endblock %}
 
 {% block content %}
-<div class="container-fluid py-4">
+<div class="admin-dashboard">
     <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-1" style="color: #1e293b; font-size: 1.8rem;">
-                <i class="bi bi-speedometer2" style="color: #667eea;"></i> Admin Dashboard
+    <div class="admin-header">
+        <div class="admin-header-left">
+            <h1 class="admin-title">
+                <i class="bi bi-speedometer2"></i> Admin Dashboard
             </h1>
-            <p class="text-muted mb-0">
+            <p class="admin-subtitle">
                 <i class="bi bi-calendar3"></i> 
                 {% if daily_stats %}
                     {{ daily_stats.0.date|date:"l, F j, Y" }}
                 {% else %}
                     Today
                 {% endif %}
-                <span class="mx-2">•</span>
+                <span class="admin-divider">•</span>
                 <i class="bi bi-arrow-repeat"></i> Live overview
             </p>
         </div>
-        <div class="d-flex gap-2">
-            <a href="/admin/" class="btn btn-outline-secondary">
+        <div class="admin-header-right">
+            <a href="{% url 'admin_job_approvals' %}" class="btn-admin-warning">
+                <i class="bi bi-briefcase"></i> Job Approvals
+            </a>
+            <a href="/admin/" class="btn-admin-secondary">
                 <i class="bi bi-gear"></i> Django Admin
             </a>
-            <a href="/" class="btn btn-primary" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none;">
+            <a href="/" class="btn-admin-primary">
                 <i class="bi bi-house"></i> Main Site
             </a>
         </div>
     </div>
 
     <!-- Stats Cards -->
-    <div class="row g-3 mb-4">
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #667eea, #764ba2);">
-                <div class="card-body text-white p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Total Conversions</p>
-                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">{{ total_conversions }}</h3>
-                        </div>
-                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-file-earmark-arrow-up" style="font-size: 1.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
+    <div class="admin-stats-grid">
+        <div class="admin-stat-card admin-stat-purple">
+            <div class="admin-stat-icon">
+                <i class="bi bi-file-earmark-arrow-up"></i>
+            </div>
+            <div class="admin-stat-content">
+                <div class="admin-stat-label">Total Conversions</div>
+                <div class="admin-stat-value">{{ total_conversions }}</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #10b981, #059669);">
-                <div class="card-body text-white p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Revenue</p>
-                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">KSH {{ total_revenue|floatformat:0 }}</h3>
-                        </div>
-                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-cash-stack" style="font-size: 1.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="admin-stat-card admin-stat-green">
+            <div class="admin-stat-icon">
+                <i class="bi bi-cash-stack"></i>
+            </div>
+            <div class="admin-stat-content">
+                <div class="admin-stat-label">Revenue</div>
+                <div class="admin-stat-value">KSH {{ total_revenue|floatformat:0 }}</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #f59e0b, #d97706);">
-                <div class="card-body text-white p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Materials</p>
-                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">{{ total_materials }}</h3>
-                        </div>
-                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-journals" style="font-size: 1.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="admin-stat-card admin-stat-amber">
+            <div class="admin-stat-icon">
+                <i class="bi bi-journals"></i>
+            </div>
+            <div class="admin-stat-content">
+                <div class="admin-stat-label">Materials</div>
+                <div class="admin-stat-value">{{ total_materials }}</div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6">
-            <div class="card border-0 shadow-sm h-100" style="border-radius: 16px; background: linear-gradient(135deg, #3b82f6, #2563eb);">
-                <div class="card-body text-white p-4">
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <p class="mb-1 opacity-75" style="font-size: 0.85rem;">Downloads</p>
-                            <h3 class="fw-bold mb-0" style="font-size: 2rem;">{{ total_downloads }}</h3>
-                        </div>
-                        <div style="width: 48px; height: 48px; background: rgba(255,255,255,0.2); border-radius: 12px; display: flex; align-items: center; justify-content: center;">
-                            <i class="bi bi-download" style="font-size: 1.5rem;"></i>
-                        </div>
-                    </div>
-                </div>
+        <div class="admin-stat-card admin-stat-blue">
+            <div class="admin-stat-icon">
+                <i class="bi bi-download"></i>
+            </div>
+            <div class="admin-stat-content">
+                <div class="admin-stat-label">Downloads</div>
+                <div class="admin-stat-value">{{ total_downloads }}</div>
+            </div>
+        </div>
+        <div class="admin-stat-card admin-stat-pink">
+            <div class="admin-stat-icon">
+                <i class="bi bi-people"></i>
+            </div>
+            <div class="admin-stat-content">
+                <div class="admin-stat-label">Total Users</div>
+                <div class="admin-stat-value">{{ total_users }}</div>
+            </div>
+        </div>
+        <div class="admin-stat-card admin-stat-teal">
+            <div class="admin-stat-icon">
+                <i class="bi bi-building"></i>
+            </div>
+            <div class="admin-stat-content">
+                <div class="admin-stat-label">Schools</div>
+                <div class="admin-stat-value">{{ total_schools }}</div>
             </div>
         </div>
     </div>
 
-    <div class="row g-4 mb-4">
-        <!-- Payment Mode Control -->
-        <div class="col-12">
-            <div class="card border-0 shadow-sm" style="border-radius: 16px; {% if is_free_period %}background: linear-gradient(135deg, #d1fae5, #a7f3d0);{% else %}background: linear-gradient(135deg, #fef3c7, #fde68a);{% endif %}">
-                <div class="card-body p-4">
-                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
-                        <div>
-                            <h5 class="fw-bold mb-1" style="color: #0f172a;">
-                                <i class="bi bi-{% if is_free_period %}unlock{% else %}lock{% endif %}-fill"></i>
-                                {% if is_free_period %}Free Period Active{% else %}Paid Period Active{% endif %}
-                            </h5>
-                            <p class="mb-0" style="color: #475569; font-size: 0.9rem;">
-                                {% if is_free_period %}
-                                    All conversions and revision materials are currently free for users.
-                                {% else %}
-                                    Users are being charged KSH {{ payment_settings.conversion_cost_per_page }}/page for conversions and KSH {{ payment_settings.global_revision_price }} for premium materials.
-                                {% endif %}
-                            </p>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <a href="{% url 'admin_payment_settings' %}" class="btn btn-primary">
-                                <i class="bi bi-credit-card"></i> Payment Settings
-                            </a>
-                            <form method="POST" action="{% url 'toggle_free_period' %}" class="d-inline">
-                                {% csrf_token %}
-                                <button type="submit" class="btn btn-{% if is_free_period %}warning{% else %}success{% endif %}" style="border: none; color: #fff;">
-                                    <i class="bi bi-{% if is_free_period %}lock{% else %}unlock{% endif %}"></i>
-                                    {% if is_free_period %}Stop Free Period{% else %}Start Free Period{% endif %}
-                                </button>
-                            </form>
-                        </div>
-                    </div>
+    <!-- Payment Mode Control -->
+    <div class="admin-payment-control {% if is_free_period %}admin-payment-free{% else %}admin-payment-paid{% endif %}">
+        <div class="admin-payment-content">
+            <div class="admin-payment-info">
+                <div class="admin-payment-status">
+                    <i class="bi bi-{% if is_free_period %}unlock{% else %}lock{% endif %}-fill"></i>
+                    {% if is_free_period %}Free Period Active{% else %}Paid Period Active{% endif %}
                 </div>
+                <div class="admin-payment-desc">
+                    {% if is_free_period %}
+                        All conversions and revision materials are currently free for users.
+                    {% else %}
+                        Users are being charged KSH {{ payment_settings.conversion_cost_per_page }}/page for conversions and KSH {{ payment_settings.global_revision_price }} for premium materials.
+                    {% endif %}
+                </div>
+            </div>
+            <div class="admin-payment-actions">
+                <a href="{% url 'admin_payment_settings' %}" class="btn-admin-action">
+                    <i class="bi bi-credit-card"></i> Payment Settings
+                </a>
+                <form method="POST" action="{% url 'toggle_free_period' %}" class="d-inline">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-admin-toggle {% if is_free_period %}btn-admin-warning{% else %}btn-admin-success{% endif %}">
+                        <i class="bi bi-{% if is_free_period %}lock{% else %}unlock{% endif %}"></i>
+                        {% if is_free_period %}Stop Free Period{% else %}Start Free Period{% endif %}
+                    </button>
+                </form>
             </div>
         </div>
     </div>
@@ -312,51 +303,165 @@
         </div>
     </div>
 
+    <!-- User Management Overview -->
+    <div class="admin-content-grid">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-title">
+                    <i class="bi bi-people"></i> User Management
+                </div>
+                <div class="admin-card-subtitle">User statistics and recent registrations</div>
+            </div>
+            <div class="admin-mini-stats">
+                <div class="admin-mini-stat">
+                    <div class="admin-mini-stat-value">{{ total_users }}</div>
+                    <div class="admin-mini-stat-label">Total Users</div>
+                </div>
+                <div class="admin-mini-stat">
+                    <div class="admin-mini-stat-value">{{ active_users }}</div>
+                    <div class="admin-mini-stat-label">Active</div>
+                </div>
+                <div class="admin-mini-stat">
+                    <div class="admin-mini-stat-value">{{ staff_users }}</div>
+                    <div class="admin-mini-stat-label">Staff</div>
+                </div>
+            </div>
+            <div class="admin-activity-list">
+                {% for user in recent_users %}
+                <div class="admin-activity-item">
+                    <div class="admin-activity-icon admin-activity-icon-purple">
+                        <i class="bi bi-person"></i>
+                    </div>
+                    <div class="admin-activity-content">
+                        <div class="admin-activity-title">{{ user.username }}</div>
+                        <div class="admin-activity-meta">{{ user.email|default:"No email" }}</div>
+                    </div>
+                    <div class="admin-activity-time">{{ user.date_joined|date:"M j" }}</div>
+                </div>
+                {% empty %}
+                <div class="admin-empty-state">
+                    <i class="bi bi-people"></i>
+                    <p>No users registered yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- School Subscriptions -->
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <div class="admin-card-title">
+                    <i class="bi bi-building"></i> School Subscriptions
+                </div>
+                <div class="admin-card-subtitle">Active and expired school plans</div>
+            </div>
+            <div class="admin-mini-stats">
+                <div class="admin-mini-stat">
+                    <div class="admin-mini-stat-value">{{ total_schools }}</div>
+                    <div class="admin-mini-stat-label">Total Schools</div>
+                </div>
+                <div class="admin-mini-stat">
+                    <div class="admin-mini-stat-value">{{ active_subscriptions }}</div>
+                    <div class="admin-mini-stat-label">Active</div>
+                </div>
+                <div class="admin-mini-stat">
+                    <div class="admin-mini-stat-value">{{ expired_subscriptions }}</div>
+                    <div class="admin-mini-stat-label">Expired</div>
+                </div>
+            </div>
+            <div class="admin-activity-list">
+                {% for school in recent_schools %}
+                <div class="admin-activity-item">
+                    <div class="admin-activity-icon admin-activity-icon-green">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div class="admin-activity-content">
+                        <div class="admin-activity-title">{{ school.school_name }}</div>
+                        <div class="admin-activity-meta">{{ school.contact_person|default:"No contact" }}</div>
+                    </div>
+                    <div class="admin-activity-time">{{ school.created_at|date:"M j" }}</div>
+                </div>
+                {% empty %}
+                <div class="admin-empty-state">
+                    <i class="bi bi-building"></i>
+                    <p>No schools registered yet</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- System Health -->
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <div class="admin-card-title">
+                <i class="bi bi-heart-pulse"></i> System Health
+            </div>
+            <div class="admin-card-subtitle">Real-time system status and performance metrics</div>
+        </div>
+        <div class="admin-health-grid">
+            <div class="admin-health-item">
+                <div class="admin-health-label">Health Score</div>
+                <div class="admin-health-bar">
+                    <div class="admin-health-fill" style="width: {{ system_health_score }}%; background: {% if system_health_score >= 80 %}#10b981{% elif system_health_score >= 50 %}#f59e0b{% else %}#ef4444{% endif %};"></div>
+                </div>
+                <div class="admin-health-value">{{ system_health_score|floatformat:0 }}%</div>
+            </div>
+            <div class="admin-health-item">
+                <div class="admin-health-label">Processing Conversions</div>
+                <div class="admin-health-value">{{ processing_conversions }}</div>
+            </div>
+            <div class="admin-health-item">
+                <div class="admin-health-label">Pending Payments</div>
+                <div class="admin-health-value">{{ pending_payments_count }}</div>
+            </div>
+            <div class="admin-health-item">
+                <div class="admin-health-label">Conversion Success Rate</div>
+                <div class="admin-health-value">{{ success_rate|floatformat:1 }}%</div>
+            </div>
+        </div>
+    </div>
+
     <!-- Revision Materials Overview -->
-    <div class="row g-4">
-        <div class="col-12">
-            <div class="card border-0 shadow-sm" style="border-radius: 16px;">
-                <div class="card-body p-4">
-                    <h5 class="fw-bold mb-3" style="color: #1e293b;">
-                        <i class="bi bi-journal-bookmark" style="color: #10b981;"></i> Revision Materials
-                    </h5>
-                    <p class="text-muted mb-4" style="font-size: 0.9rem;">Popular and recently added resources</p>
-                    
-                    <div class="row g-4">
-                        <div class="col-md-6">
-                            <h6 class="fw-semibold mb-3" style="color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Top Materials</h6>
-                            {% for material in top_materials %}
-                            <div class="d-flex align-items-center py-2" style="border-bottom: 1px solid #f1f5f9;">
-                                <div class="me-3" style="width: 36px; height: 36px; background: #d1fae5; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-file-earmark-text" style="color: #10b981; font-size: 0.9rem;"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="fw-medium" style="color: #1e293b; font-size: 0.9rem;">{{ material.title }}</div>
-                                    <small class="text-muted">{{ material.download_count }} downloads</small>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <p class="text-muted small">No materials yet.</p>
-                            {% endfor %}
-                        </div>
-                        <div class="col-md-6">
-                            <h6 class="fw-semibold mb-3" style="color: #475569; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px;">Newest Uploads</h6>
-                            {% for material in recent_materials %}
-                            <div class="d-flex align-items-center py-2" style="border-bottom: 1px solid #f1f5f9;">
-                                <div class="me-3" style="width: 36px; height: 36px; background: #eef2ff; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
-                                    <i class="bi bi-file-earmark-plus" style="color: #667eea; font-size: 0.9rem;"></i>
-                                </div>
-                                <div class="flex-grow-1">
-                                    <div class="fw-medium" style="color: #1e293b; font-size: 0.9rem;">{{ material.title }}</div>
-                                    <small class="text-muted">{{ material.created_at|date:"M j, Y" }}</small>
-                                </div>
-                            </div>
-                            {% empty %}
-                            <p class="text-muted small">Nothing added recently.</p>
-                            {% endfor %}
-                        </div>
+    <div class="admin-card">
+        <div class="admin-card-header">
+            <div class="admin-card-title">
+                <i class="bi bi-journal-bookmark"></i> Revision Materials
+            </div>
+            <div class="admin-card-subtitle">Popular and recently added resources</div>
+        </div>
+        <div class="admin-materials-grid">
+            <div class="admin-material-section">
+                <h6>Top Materials</h6>
+                {% for material in top_materials %}
+                <div class="admin-material-item">
+                    <div class="admin-material-icon admin-material-icon-green">
+                        <i class="bi bi-file-earmark-text"></i>
+                    </div>
+                    <div class="admin-material-content">
+                        <div class="admin-material-title">{{ material.title }}</div>
+                        <div class="admin-material-meta">{{ material.download_count }} downloads</div>
                     </div>
                 </div>
+                {% empty %}
+                <p class="text-muted small">No materials yet.</p>
+                {% endfor %}
+            </div>
+            <div class="admin-material-section">
+                <h6>Newest Uploads</h6>
+                {% for material in recent_materials %}
+                <div class="admin-material-item">
+                    <div class="admin-material-icon admin-material-icon-purple">
+                        <i class="bi bi-file-earmark-plus"></i>
+                    </div>
+                    <div class="admin-material-content">
+                        <div class="admin-material-title">{{ material.title }}</div>
+                        <div class="admin-material-meta">{{ material.created_at|date:"M j, Y" }}</div>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="text-muted small">Nothing added recently.</p>
+                {% endfor %}
             </div>
         </div>
     </div>

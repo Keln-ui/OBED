@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import user_passes_test
+from django.contrib.auth.models import User
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
 from datetime import timedelta
@@ -150,6 +151,24 @@ def admin_dashboard(request):
     # Average revenue per conversion
     avg_revenue = (total_revenue / total_payments) if total_payments > 0 else 0
     
+    # User statistics
+    total_users = User.objects.count()
+    active_users = User.objects.filter(is_active=True).count()
+    staff_users = User.objects.filter(is_staff=True).count()
+    recent_users = User.objects.all().order_by('-date_joined')[:5]
+    
+    # School subscription statistics
+    total_schools = SchoolProfile.objects.count()
+    active_subscriptions = SchoolSubscription.objects.filter(status='active').count()
+    expired_subscriptions = SchoolSubscription.objects.filter(status='expired').count()
+    recent_schools = SchoolProfile.objects.all().order_by('-registered_at')[:5]
+    
+    # System health metrics
+    processing_conversions = ConvertedFile.objects.filter(status='processing').count()
+    pending_payments_count = Payment.objects.filter(status='pending').count()
+    system_health_score = 100 - (failed_conversions.count() * 2) - (pending_payments_count * 1)
+    system_health_score = max(0, min(100, system_health_score))
+    
     context = {
         'total_conversions': total_conversions,
         'total_payments': total_payments,
@@ -177,6 +196,20 @@ def admin_dashboard(request):
         'avg_pages': avg_pages,
         'total_file_size': total_file_size,
         'success_rate': success_rate,
+        # User stats
+        'total_users': total_users,
+        'active_users': active_users,
+        'staff_users': staff_users,
+        'recent_users': recent_users,
+        # School subscription stats
+        'total_schools': total_schools,
+        'active_subscriptions': active_subscriptions,
+        'expired_subscriptions': expired_subscriptions,
+        'recent_schools': recent_schools,
+        # System health
+        'processing_conversions': processing_conversions,
+        'pending_payments_count': pending_payments_count,
+        'system_health_score': system_health_score,
         # Payment settings
         'payment_settings': get_payment_settings(),
         'is_free_period': is_free_period(),

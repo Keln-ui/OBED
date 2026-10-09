@@ -1,0 +1,132 @@
+{% extends 'base.html' %}
+
+{% block title %}Post a Job - CoreSynch{% endblock %}
+
+{% block content %}
+<section class="jobs-detail-header-new">
+  <div class="container">
+    <div class="jobs-detail-content-new">
+      <span class="jobs-detail-badge-new">Job Posting</span>
+      <h1 class="jobs-detail-title-new">Post a Job Advertisement</h1>
+      <p class="jobs-detail-desc-new">Reach qualified educators across Kenya. Post your BOM or homeschooling job opening today.</p>
+    </div>
+  </div>
+</section>
+
+<section class="jobs-post-section-new">
+  <div class="container">
+    <div class="jobs-post-container-new">
+      <div class="jobs-post-form-new">
+        <h2 class="jobs-post-heading-new">Job Details</h2>
+        
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+              {{ message }}
+              <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+          {% endfor %}
+        {% endif %}
+
+        <form method="post" action="{% url 'post_job' %}">
+          {% csrf_token %}
+          
+          <div class="form-group-new">
+            <label class="form-label-new">Job Type *</label>
+            <select name="job_type" class="form-select-new" required>
+              <option value="">Select job type</option>
+              <option value="bom">BOM Teaching Job</option>
+              <option value="homeschooling">Homeschooling Job</option>
+            </select>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Employment Type *</label>
+            <select name="employment_type" class="form-select-new" required>
+              <option value="full-time">Full-time</option>
+              <option value="part-time">Part-time</option>
+              <option value="contract">Contract</option>
+            </select>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Job Title *</label>
+            <input type="text" name="title" class="form-input-new" placeholder="e.g. Mathematics Teacher" required>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">School/Organization Name *</label>
+            <input type="text" name="school_name" class="form-input-new" placeholder="e.g. St. Mary's BOM School" required>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Location *</label>
+            <input type="text" name="location" class="form-input-new" placeholder="e.g. Nairobi" required>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Job Description *</label>
+            <textarea name="description" class="form-textarea-new" rows="4" placeholder="Describe the role, responsibilities, and what you're looking for..." required></textarea>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Requirements *</label>
+            <textarea name="requirements" class="form-textarea-new" rows="4" placeholder="List job requirements (one per line)&#10;- Bachelor's Degree in Education&#10;- 2+ years experience&#10;- TSC registration" required></textarea>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Salary Range *</label>
+            <input type="text" name="salary_range" class="form-input-new" placeholder="e.g. Ksh 35,000 - 45,000/month" required>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Contact Email *</label>
+            <input type="email" name="contact_email" class="form-input-new" placeholder="e.g. jobs@school.com" required>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Contact Phone</label>
+            <input type="text" name="contact_phone" class="form-input-new" placeholder="e.g. +254 7XX XXX XXX">
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-label-new">Expiry Date</label>
+            <input type="date" name="expires_at" class="form-input-new">
+            <small class="form-help-new">Leave blank for no expiry</small>
+          </div>
+
+          <div class="form-group-new">
+            <label class="form-checkbox-new">
+              <input type="checkbox" name="featured">
+              <span>Featured Job (appears first in rotation)</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-job-submit-new">
+            <i class="bi bi-send"></i> Post Job Advertisement
+          </button>
+        </form>
+      </div>
+
+      <div class="jobs-post-info-new">
+        <h3 class="jobs-post-info-heading-new">Posting Guidelines</h3>
+        <ul class="jobs-post-info-list-new">
+          <li><i class="bi bi-check-circle"></i> Provide accurate and complete job information</li>
+          <li><i class="bi bi-check-circle"></i> Include clear salary ranges to attract qualified candidates</li>
+          <li><i class="bi bi-check-circle"></i> Specify all requirements to filter applicants effectively</li>
+          <li><i class="bi bi-check-circle"></i> Set expiry dates for time-sensitive positions</li>
+          <li><i class="bi bi-check-circle"></i> Featured jobs get priority placement on homepage</li>
+        </ul>
+        
+        <div class="jobs-post-contact-new">
+          <h4>Need Help?</h4>
+          <p>Contact us for assistance with job postings</p>
+          <a href="mailto:jobs@coresynch.com" class="btn-job-contact-new">
+            <i class="bi bi-envelope"></i> Contact Support
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

@@ -9,7 +9,7 @@ class TextPDFConverter(BaseConverter):
     """Converter for text-based PDFs using pdf2docx"""
     
     def convert(self) -> bool:
-        """Convert text-based PDF to Word"""
+        """Convert text-based PDF to Word with formatting preservation"""
         try:
             if not self.validate_pdf():
                 logger.error(f"Invalid PDF file: {self.pdf_path}")
@@ -18,9 +18,20 @@ class TextPDFConverter(BaseConverter):
             # Create output directory if it doesn't exist
             self.output_path.parent.mkdir(parents=True, exist_ok=True)
             
-            # Convert PDF to Word
+            # Convert PDF to Word with formatting preservation
             cv = Converter(str(self.pdf_path))
-            cv.convert(str(self.output_path))
+            
+            # Convert with better formatting options
+            cv.convert(
+                str(self.output_path),
+                start=0,
+                end=None,
+                multi_processing=True,
+                keep_layout=True,  # Preserve original layout
+                format_pic=True,   # Format pictures
+                table_strategy='auto',  # Auto-detect tables
+            )
+            
             cv.close()
             
             logger.info(f"Successfully converted {self.pdf_path} to {self.output_path}")
