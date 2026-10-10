@@ -32,6 +32,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'pdf_converter',
     'revision',
+    # Django Allauth
+    'django.contrib.sites',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
@@ -42,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'word_converter.urls'
@@ -118,6 +125,32 @@ USE_TZ = True
 LOGIN_URL = '/accounts/login/'
 LOGIN_REDIRECT_URL = '/'
 
+# Django Allauth Configuration
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`
+    'django.contrib.auth.backends.ModelBackend',
+    # `allauth` specific authentication methods, such as login by e-mail
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# Site ID for allauth (required)
+SITE_ID = 1
+
+# Allauth account settings
+ACCOUNT_LOGIN_METHODS = {'email'}
+ACCOUNT_SIGNUP_FIELDS = ['email*', 'password1*', 'password2*']
+ACCOUNT_UNIQUE_EMAIL = True
+ACCOUNT_EMAIL_VERIFICATION = 'none'  # 'mandatory', 'optional', or 'none'
+ACCOUNT_SESSION_REMEMBER = True
+ACCOUNT_ADAPTER = 'pdf_converter.adapters.CustomAccountAdapter'
+
+# Allauth social account settings
+SOCIALACCOUNT_LOGIN_ON_GET = False
+SOCIALACCOUNT_REQUEST_EMAIL_VERIFICATION = False
+SOCIALACCOUNT_EMAIL_VERIFICATION = 'none'
+SOCIALACCOUNT_EMAIL_REQUIRED = True
+SOCIALACCOUNT_ADAPTER = 'pdf_converter.adapters.CustomSocialAccountAdapter'
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
@@ -168,11 +201,11 @@ CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000', 'https
 
 # Email Configuration for Password Reset
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465
-EMAIL_USE_SSL = True
-EMAIL_USE_TLS = False
-EMAIL_HOST_USER = 'jomokelvin1143@gmail.com'
-EMAIL_HOST_PASSWORD = 'avwc puzj kelm obpe'
-DEFAULT_FROM_EMAIL = 'jomokelvin1143@gmail.com'
+EMAIL_HOST = 'mail.coresync.co.ke'
+EMAIL_PORT = 587
+EMAIL_USE_SSL = False
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'help@coresync.co.ke'
+EMAIL_HOST_PASSWORD = 'Kevin@1143'
+DEFAULT_FROM_EMAIL = 'help@coresync.co.ke'
 EMAIL_TIMEOUT = 30

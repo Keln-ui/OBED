@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import SubscriptionPlan
+import secrets
+import string
 
 
 class SchoolRegistrationForm(UserCreationForm):
@@ -73,3 +75,29 @@ class SubscriptionPaymentForm(forms.Form):
             'required': True,
         })
     )
+
+
+class SimpleUserRegistrationForm(forms.ModelForm):
+    """Simple registration form that only requires email and username. Password is auto-generated."""
+    username = forms.CharField(
+        max_length=150,
+        label='Username',
+        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'Choose a username'})
+    )
+    email = forms.EmailField(
+        label='Email Address',
+        widget=forms.EmailInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'your@email.com'})
+    )
+
+    class Meta:
+        model = User
+        fields = ('username', 'email')
+
+    def save(self, commit=True):
+        user = super().save(commit=False)
+        # Generate a random password
+        password = ''.join(secrets.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(12))
+        user.set_password(password)
+        if commit:
+            user.save()
+        return user, password

@@ -38,7 +38,6 @@ urlpatterns = [
     # School Registration & Subscription
     path('register/', views.school_register, name='school_register'),
     path('register/user/', views.user_register, name='user_register'),
-    path('verify-email/<uidb64>/<token>/', views.verify_email, name='verify_email'),
     path('subscription/plans/', views.subscription_plans, name='subscription_plans'),
     
     # Job Listings

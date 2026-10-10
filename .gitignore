@@ -39,3 +39,4 @@ local_settings.py
 # OS
 .DS_Store
 Thumbs.db
+add_google_oauth.py 

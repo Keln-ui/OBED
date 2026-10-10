@@ -72,3 +72,5 @@ uharfbuzz==0.55.0
 urllib3==2.7.0
 Werkzeug==3.1.8
 xlsxwriter==3.2.9
+django-allauth==65.19.7
+PyJWT==2.15.1

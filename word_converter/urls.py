@@ -6,7 +6,7 @@ from django.urls import path, include, re_path
 from django.conf import settings
 from django.conf.urls.static import static
 import pdf_converter.views
-from pdf_converter.views import subscription_required, custom_password_reset
+from pdf_converter.views import subscription_required, custom_password_reset, password_reset_done, password_reset_confirm, password_reset_complete
 from pdf_converter import admin_views
 
 urlpatterns = [
@@ -19,9 +19,15 @@ urlpatterns = [
     path('admin/payment-settings/', admin_views.admin_payment_settings, name='admin_payment_settings'),
     path('admin/dashboard/', admin_views.admin_dashboard, name='admin_dashboard_custom'),
     path('admin/', admin.site.urls),
+    # Django Allauth URLs (social authentication) - must come before custom login
+    path('accounts/', include('allauth.urls')),
+    # Custom password reset override
     path('accounts/password_reset/', custom_password_reset, name='password_reset'),
-    path('accounts/login/', pdf_converter.views.login_view, name='login'),
-    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/password_reset/done/', password_reset_done, name='password_reset_done'),
+    path('accounts/reset/<uidb64>/<token>/', password_reset_confirm, name='password_reset_confirm'),
+    path('accounts/reset/done/', password_reset_complete, name='password_reset_complete'),
+    # Custom login view override
+    path('accounts/login/', pdf_converter.views.login_view, name='account_login'),
     path('', include('pdf_converter.urls')),
     path('payment/', include('pdf_converter.payment_urls')),
     path('revision/', include('revision.urls')),

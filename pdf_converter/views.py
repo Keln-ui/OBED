@@ -98,40 +98,29 @@ def logout_view(request):
 # USER REGISTRATION (simple account for marking scheme downloads)
 # ---------------------------------------------------------------------------
 def user_register(request):
-    """Register a simple user account (not a school) with email verification."""
-    from django.contrib.auth.forms import UserCreationForm
-    from django.contrib.auth.tokens import default_token_generator
-    from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
-    from django.utils.encoding import force_bytes, force_str
+    """Register a simple user account (not a school) with auto-generated password sent via email."""
+    from .forms import SimpleUserRegistrationForm
     from django.core.mail import send_mail
     from django.template.loader import render_to_string
     from django.conf import settings
     from django.contrib.sites.shortcuts import get_current_site
-    
+
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = SimpleUserRegistrationForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.email = form.cleaned_data.get('email', '')
-            user.is_active = False  # User must verify email before activation
+            user, password = form.save(commit=True)
+            user.is_active = True  # User is active immediately since password is sent via email
             user.save()
-            
-            # Generate verification token
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            
-            # Build verification URL
+
+            # Send email with credentials
             current_site = get_current_site(request)
-            verification_url = f"http://{current_site.domain}/verify-email/{uid}/{token}/"
-            
-            # Send verification email
-            subject = 'Verify your CoreSynch account'
-            message = render_to_string('registration/verification_email.html', {
+            subject = 'Welcome to CoreSynch - Your Account Credentials'
+            message = render_to_string('registration/registration_email.html', {
                 'user': user,
-                'verification_url': verification_url,
+                'password': password,
                 'domain': current_site.domain,
             })
-            
+
             try:
                 send_mail(
                     subject,
@@ -141,40 +130,16 @@ def user_register(request):
                     fail_silently=False,
                     html_message=message,
                 )
-                messages.success(request, f'Registration successful! A verification email has been sent to {user.email}. Please check your inbox to activate your account.')
+                messages.success(request, f'Registration successful! Your account credentials have been sent to {user.email}. Please check your inbox.')
                 return redirect('login')
             except Exception as e:
-                messages.error(request, f'Failed to send verification email: {str(e)}')
+                messages.error(request, f'Failed to send registration email: {str(e)}')
                 user.delete()  # Delete user if email fails
                 return redirect('user_register')
     else:
-        form = UserCreationForm()
-    
+        form = SimpleUserRegistrationForm()
+
     return render(request, 'registration/user_register.html', {'form': form})
-
-
-def verify_email(request, uidb64, token):
-    """Verify user email with token."""
-    from django.contrib.auth.tokens import default_token_generator
-    from django.utils.http import urlsafe_base64_decode
-    from django.utils.encoding import force_str
-    from django.contrib.auth import login
-    
-    try:
-        uid = force_str(urlsafe_base64_decode(uidb64))
-        user = User.objects.get(pk=uid)
-    except (TypeError, ValueError, OverflowError, User.DoesNotExist):
-        user = None
-    
-    if user is not None and default_token_generator.check_token(user, token):
-        user.is_active = True
-        user.save()
-        login(request, user)
-        messages.success(request, 'Your email has been verified! Your account is now active.')
-        return redirect('index')
-    else:
-        messages.error(request, 'Invalid verification link or link has expired.')
-        return redirect('login')
 
 
 # ---------------------------------------------------------------------------
@@ -1586,32 +1551,65 @@ def custom_password_reset(request):
     """Password reset view that validates email exists before sending reset link."""
     from django.contrib.auth.forms import PasswordResetForm
     from django.contrib.auth.models import User
-    
+    import logging
+
+    logger = logging.getLogger(__name__)
+
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
-        
+
         if not email:
             messages.error(request, 'Please enter your email address.')
             return render(request, 'registration/password_reset.html')
-        
+
         if not User.objects.filter(email=email).exists():
             messages.error(request, 'This email is not registered in our system.')
             return render(request, 'registration/password_reset.html')
-        
+
         form = PasswordResetForm(request.POST)
         if form.is_valid():
-            form.save(
-                subject_template_name='registration/password_reset_subject.txt',
-                email_template_name='registration/password_reset_email.html',
-                html_email_template_name='registration/password_reset_email.html',
-                request=request,
-            )
-            messages.success(request, 'Password reset link has been sent to your email.')
-            return redirect('password_reset_done')
+            try:
+                form.save(
+                    subject_template_name='registration/password_reset_subject.txt',
+                    email_template_name='registration/password_reset_email.html',
+                    html_email_template_name='registration/password_reset_email.html',
+                    request=request,
+                )
+                messages.success(request, 'Password reset link has been sent to your email.')
+                logger.info(f"Password reset email sent to {email}")
+                return redirect('password_reset_done')
+            except Exception as e:
+                logger.error(f"Failed to send password reset email to {email}: {str(e)}")
+                messages.error(request, f'Failed to send password reset email: {str(e)}')
+                return render(request, 'registration/password_reset.html', {'form': form})
+        else:
+            messages.error(request, 'Invalid form data. Please try again.')
     else:
         form = PasswordResetForm()
-    
+
     return render(request, 'registration/password_reset.html', {'form': form})
+
+
+def password_reset_done(request):
+    """View shown after password reset email is sent."""
+    return render(request, 'registration/password_reset_done.html')
+
+
+def password_reset_confirm(request, uidb64, token):
+    """View for confirming password reset with token."""
+    from django.contrib.auth.views import PasswordResetConfirmView
+    from django.contrib.auth.forms import SetPasswordForm
+
+    view = PasswordResetConfirmView.as_view(
+        template_name='registration/password_reset_confirm.html',
+        post_reset_login=True,
+    )
+    return view(request, uidb64=uidb64, token=token)
+
+
+def password_reset_complete(request):
+    """View shown after password reset is complete."""
+    return render(request, 'registration/password_reset_complete.html')
 
 
 def login_view(request):

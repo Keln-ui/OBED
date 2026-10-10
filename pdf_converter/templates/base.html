@@ -16,10 +16,10 @@
             <a class="navbar-brand-modern" href="{% url 'index' %}">
                 <span class="navbar-brand-text">CoreSynch</span>
             </a>
-            <button class="navbar-toggler-modern" type="button" data-bs-toggle="collapse" data-bs-target="#nav">
+            <button class="navbar-toggler-modern" type="button" data-bs-toggle="collapse" data-bs-target="#nav" aria-controls="nav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon-modern"></span>
             </button>
-            <div class="navbar-collapse-modern" id="nav">
+            <div class="navbar-collapse-modern collapse" id="nav" aria-expanded="false">
                 <ul class="navbar-nav-modern">
                     <li class="nav-item-modern"><a class="nav-link-modern" href="{% url 'index' %}">Home</a></li>
                     <li class="nav-item-modern"><a class="nav-link-modern" href="{% url 'revision_home' %}">Revision Materials</a></li>
