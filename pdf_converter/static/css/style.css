@@ -308,7 +308,7 @@ body {
 }
 
 /* Bootstrap's .collapse:not(.show) would otherwise hide the links on desktop */
-@media (min-width: 993px) {
+@media (min-width: 1200px) {
   .navbar-collapse-modern.collapse {
     display: flex !important;
   }
@@ -331,7 +331,7 @@ body {
 .nav-link-modern {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   font-size: 0.95rem;
@@ -393,7 +393,7 @@ body {
   background: rgba(239, 68, 68, 0.1);
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1199.98px) {
   .navbar-toggler-modern {
     display: block;
   }
