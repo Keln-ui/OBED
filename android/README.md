@@ -32,3 +32,7 @@ Keep the keystore and its passwords safe and out of git. Play Store and sideload
 ## Known limitation
 
 Google blocks "Sign in with Google" inside embedded WebViews. Inside the app, users should sign in with email and password.
+
+## Website download button
+
+The site serves the APK at `/app/download/` (the "Get the Android App" button on the home page and the "Android App" link in the footer). The file is `pdf_converter/static/android-app/CoreSynch.apk`. After building a new release, copy `app/build/outputs/apk/release/app-release.apk` over it and deploy. Inside the app itself, the button is hidden: the app's user agent contains `CoreSynchApp`.

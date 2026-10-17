@@ -59,6 +59,23 @@ def _safe_cleanup(temp_dir):
 
 
 # ---------------------------------------------------------------------------
+# ANDROID APP
+# ---------------------------------------------------------------------------
+def download_android_app(request):
+    from django.contrib.staticfiles import finders
+    from django.http import Http404
+    apk_path = finders.find('android-app/CoreSynch.apk')
+    if not apk_path:
+        raise Http404('Android app not available')
+    return FileResponse(
+        open(apk_path, 'rb'),
+        as_attachment=True,
+        filename='CoreSynch.apk',
+        content_type='application/vnd.android.package-archive',
+    )
+
+
+# ---------------------------------------------------------------------------
 # HOME
 # ---------------------------------------------------------------------------
 def index(request):

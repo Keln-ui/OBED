@@ -4,6 +4,7 @@ from . import admin_views
 
 urlpatterns = [
     path('', views.index, name='index'),
+    path('app/download/', views.download_android_app, name='download_android_app'),
     path('upload/', views.upload_pdf, name='upload_pdf'),
     path('pdf-tools/merge/', views.pdf_tool_merge, name='pdf_tool_merge'),
     path('pdf-tools/split/', views.pdf_tool_split, name='pdf_tool_split'),
