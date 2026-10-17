@@ -52,6 +52,9 @@
                 <div>
                     <a href="mailto:coresync@coresync.co.ke" class="text-muted small text-decoration-none me-3">coresync@coresync.co.ke</a>
                     <a href="https://wa.me/254757924041" target="_blank" class="text-muted small text-decoration-none me-3">WhatsApp</a>
+                    {% if 'CoreSynchApp' not in request.META.HTTP_USER_AGENT %}
+                    <a href="{% url 'download_android_app' %}" class="text-muted small text-decoration-none me-3">Android App</a>
+                    {% endif %}
                     <a href="#" class="text-muted small text-decoration-none">Privacy</a>
                 </div>
             </div>

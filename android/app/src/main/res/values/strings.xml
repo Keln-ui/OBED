@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CoreSynch</string>
+    <string name="download_started">Downloading…</string>
+    <string name="no_app_for_link">No app found to open this link</string>
+</resources>

@@ -56,6 +56,12 @@
             <span>Browse Materials</span>
             <i class="bi bi-book"></i>
           </a>
+          {% if 'CoreSynchApp' not in request.META.HTTP_USER_AGENT %}
+          <a href="{% url 'download_android_app' %}" class="btn-hero-modern btn-hero-secondary-modern">
+            <span>Get the Android App</span>
+            <i class="bi bi-android2"></i>
+          </a>
+          {% endif %}
         </div>
         <div class="hero-trust-modern">
           <div class="trust-item">

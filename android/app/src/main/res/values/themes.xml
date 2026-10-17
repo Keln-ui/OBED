@@ -1,0 +1,12 @@
+<resources>
+    <color name="brand_dark">#0F172A</color>
+    <color name="brand_primary">#6366F1</color>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/brand_primary</item>
+        <item name="colorPrimaryDark">@color/brand_dark</item>
+        <item name="colorAccent">@color/brand_primary</item>
+        <item name="android:statusBarColor">@color/brand_dark</item>
+        <item name="android:windowBackground">@android:color/white</item>
+    </style>
+</resources>
