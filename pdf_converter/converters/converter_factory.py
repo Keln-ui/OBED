@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 class ConverterFactory:
     """Factory to determine the appropriate converter based on file type and output format"""
     
-    SUPPORTED_FORMATS = ['docx', 'doc', 'txt', 'html', 'json', 'csv', 'pptx']
-    IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif')
+    SUPPORTED_FORMATS = ['docx', 'txt', 'html', 'json', 'csv', 'pptx']
+    IMAGE_EXTENSIONS = ('.png', '.jpg', '.jpeg', '.bmp', '.gif', '.tiff', '.tif', '.webp')
     
     @staticmethod
     def get_converter(pdf_path: str, output_path: str, output_format: str = 'docx', use_ocr: bool = False):
@@ -27,7 +27,7 @@ class ConverterFactory:
         Args:
             pdf_path: Path to the PDF or image file
             output_path: Path for the output file
-            output_format: Desired output format (docx, doc, txt, html, json, csv)
+            output_format: Desired output format (docx, txt, html, json, csv, pptx)
             use_ocr: Force use of OCR converter
         
         Returns:
@@ -80,9 +80,9 @@ class ConverterFactory:
             except Exception as e:
                 logger.warning(f"Error detecting PDF type: {str(e)}")
         
-        # For docx/doc output, ALWAYS use the image-based converter to preserve original layout
-        if output_format in ('docx', 'doc'):
-            logger.info(f"Using DocxImageConverter for {output_format} format (full layout preservation)")
+        # Use the layout-aware Word converter for editable Word documents.
+        if output_format == 'docx':
+            logger.info("Using DocxImageConverter for editable Word output with layout preservation")
             return DocxImageConverter(pdf_path, output_path, use_ocr=should_use_ocr)
         
         # For scanned PDFs with text-based formats, use OCR

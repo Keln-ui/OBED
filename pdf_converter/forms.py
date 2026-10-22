@@ -2,8 +2,6 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import SubscriptionPlan
-import secrets
-import string
 
 
 class SchoolRegistrationForm(UserCreationForm):
@@ -77,27 +75,35 @@ class SubscriptionPaymentForm(forms.Form):
     )
 
 
-class SimpleUserRegistrationForm(forms.ModelForm):
-    """Simple registration form that only requires email and username. Password is auto-generated."""
-    username = forms.CharField(
-        max_length=150,
-        label='Username',
-        widget=forms.TextInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'Choose a username'})
-    )
+class SimpleUserRegistrationForm(UserCreationForm):
+    """Registration form for individual accounts."""
     email = forms.EmailField(
         label='Email Address',
-        widget=forms.EmailInput(attrs={'class': 'form-control form-control-lg', 'placeholder': 'your@email.com'})
+        widget=forms.EmailInput(attrs={
+            'class': 'form-control form-control-lg',
+            'placeholder': 'your@email.com',
+            'autocomplete': 'email',
+        })
     )
 
     class Meta:
         model = User
-        fields = ('username', 'email')
+        fields = ('username', 'email', 'password1', 'password2')
 
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        # Generate a random password
-        password = ''.join(secrets.choice(string.ascii_letters + string.digits + string.punctuation) for _ in range(12))
-        user.set_password(password)
-        if commit:
-            user.save()
-        return user, password
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Choose a username',
+            'autocomplete': 'username',
+        })
+        self.fields['password1'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Create a password',
+            'autocomplete': 'new-password',
+        })
+        self.fields['password2'].widget.attrs.update({
+            'class': 'form-control form-control-lg',
+            'placeholder': 'Confirm your password',
+            'autocomplete': 'new-password',
+        })

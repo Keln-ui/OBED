@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Converter Admin Dashboard - CoreSynch{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <p class="text-uppercase text-primary fw-semibold small mb-1">Document converter</p>
+            <h1 class="h2 fw-bold mb-1">Converter Admin Dashboard</h1>
+            <p class="text-muted mb-0">Monitor file processing, payments, and converter settings.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary" href="{% url 'admin:index' %}">Django Admin</a>
+            <a class="btn btn-primary" href="{% url 'index' %}">Converter site</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Conversions</p><p class="display-6 fw-bold mb-0">{{ total_conversions }}</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Completed payments</p><p class="display-6 fw-bold mb-0">{{ total_payments }}</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Revenue</p><p class="h3 fw-bold mb-0">KSH {{ total_revenue|floatformat:0 }}</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Active users</p><p class="display-6 fw-bold mb-0">{{ active_users }}</p>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-bold mb-3">Recent conversions</h2>
+                    <div class="table-responsive">
+                        <table class="table align-middle">
+                            <thead><tr><th>File</th><th>Format</th><th>Status</th><th>Date</th></tr></thead>
+                            <tbody>
+                                {% for conversion in recent_conversions %}
+                                <tr>
+                                    <td>{{ conversion.original_pdf_filename }}</td>
+                                    <td>{{ conversion.output_format|upper }}</td>
+                                    <td>{{ conversion.status|title }}</td>
+                                    <td>{{ conversion.created_at|date:"M j, Y" }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr><td colspan="4" class="text-center text-muted py-4">No conversions yet.</td></tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-bold mb-3">Converter operations</h2>
+                    <p><strong>{{ pending_payments_count }}</strong> payments pending · <strong>{{ processing_conversions }}</strong> conversions processing</p>
+                    <div class="d-grid gap-2 mb-4">
+                        <a class="btn btn-primary" href="{% url 'admin_payment_settings' %}">Payment settings</a>
+                        <a class="btn btn-outline-primary" href="{% url 'admin_plans_list' %}">Subscription plans</a>
+                        <a class="btn btn-outline-secondary" href="/admin/pdf_converter/convertedfile/">Manage conversions</a>
+                        <a class="btn btn-outline-secondary" href="/admin/pdf_converter/payment/">Manage payments</a>
+                    </div>
+                    <h3 class="h6 fw-bold">Pending payments</h3>
+                    <ul class="list-group list-group-flush">
+                        {% for payment in pending_payments %}
+                        <li class="list-group-item px-0">
+                            <span class="fw-semibold">{{ payment.phone_number }} · KSH {{ payment.amount }}</span><br>
+                            <span class="text-muted small">{{ payment.created_at|date:"M j, Y" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item px-0 text-muted">No pending payments.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

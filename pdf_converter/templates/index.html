@@ -1,291 +1,82 @@
 {% extends 'base.html' %}
-{% load static %}
 
-{% block title %}CoreSynch - Document Converter & Academic Platform{% endblock %}
+{% block title %}CoreSynch Document Converter{% endblock %}
 
 {% block content %}
 
+<div class="converter-home">
 <!-- ============================================================
-     HERO SECTION
+     DOCUMENT CONVERTER HERO
      ============================================================ -->
-<section class="hero-section-modern">
-  <div class="hero-background">
-    <div class="hero-gradient-orb hero-orb-1"></div>
-    <div class="hero-gradient-orb hero-orb-2"></div>
-    <div class="hero-gradient-orb hero-orb-3"></div>
-    <div class="hero-grid-pattern"></div>
-  </div>
+<section class="home-hero converter-hero">
+  <div class="home-hero-glow home-hero-glow-one" aria-hidden="true"></div>
+  <div class="home-hero-glow home-hero-glow-two" aria-hidden="true"></div>
   <div class="container">
-    <div class="hero-content-modern">
-      <div class="hero-left-modern">
-        <div class="hero-logo-modern">
-          <img src="{% static 'images/logo.png' %}" alt="CoreSynch" height="45">
-        </div>
-        <div class="hero-tag-modern">
-          <span class="hero-tag-icon">🚀</span>
-          <span class="hero-tag-text">Kenya's #1 Document Platform</span>
-        </div>
-        <h1 class="hero-title-modern">
-          Transform Your Documents<br>
-          <span class="hero-title-highlight">Into Anything</span>
-        </h1>
-        <p class="hero-description-modern">
-          Convert PDFs to Word, access revision materials, generate schemes of work, and find teaching jobs. 
-          One platform for all your academic and professional needs.
+    <div class="home-hero-grid">
+      <div class="home-hero-copy">
+        <p class="home-eyebrow"><span></span> SIMPLE TOOLS. BETTER DOCUMENTS.</p>
+        <h1>Your files,<br><span>ready for anything.</span></h1>
+        <p class="home-hero-description">
+          Convert PDFs, images, and Word documents in a few clicks. Then polish your PDFs with a toolkit built for everyday work.
         </p>
-        <div class="hero-stats-modern">
-          <div class="hero-stat-modern">
-            <div class="hero-stat-number">{{ total_materials }}+</div>
-            <div class="hero-stat-label">Materials</div>
-          </div>
-          <div class="hero-stat-modern">
-            <div class="hero-stat-number">14+</div>
-            <div class="hero-stat-label">PDF Tools</div>
-          </div>
-          <div class="hero-stat-modern">
-            <div class="hero-stat-number">Free</div>
-            <div class="hero-stat-label">Basic Tools</div>
-          </div>
-        </div>
-        <div class="hero-actions-modern">
-          <a href="#converter" class="btn-hero-modern btn-hero-primary-modern">
-            <span>Start Converting</span>
-            <i class="bi bi-arrow-right"></i>
+        <div class="home-hero-actions">
+          <a href="#converter" class="home-button home-button-primary">
+            Start converting <i class="bi bi-arrow-up-right"></i>
           </a>
-          <a href="{% url 'revision_home' %}" class="btn-hero-modern btn-hero-secondary-modern">
-            <span>Browse Materials</span>
-            <i class="bi bi-book"></i>
+          <a href="#pdf-tools" class="home-button home-button-secondary">
+            Explore PDF utilities <i class="bi bi-arrow-right"></i>
           </a>
         </div>
-        <div class="hero-trust-modern">
-          <div class="trust-item">
-            <i class="bi bi-shield-check"></i>
-            <span>Secure & Private</span>
-          </div>
-          <div class="trust-item">
-            <i class="bi bi-lightning"></i>
-            <span>Instant Conversion</span>
-          </div>
-          <div class="trust-item">
-            <i class="bi bi-check-circle"></i>
-            <span>High Quality</span>
-          </div>
+        <div class="home-hero-stats" aria-label="Converter highlights">
+          <div><strong>{{ total_formats }}</strong><span>export formats</span></div>
+          <div><strong>14</strong><span>PDF utilities</span></div>
+          <div><strong>2</strong><span>free converters</span></div>
         </div>
       </div>
-      <div class="hero-right-modern">
-        <div class="hero-visual-modern">
-          <div class="hero-card-modern hero-card-1">
-            <div class="hero-card-icon-modern">
-              <i class="bi bi-file-earmark-pdf-fill"></i>
-            </div>
-            <div class="hero-card-content-modern">
-              <div class="hero-card-title-modern">PDF to Word</div>
-              <div class="hero-card-status-modern status-success">Converted</div>
-            </div>
+      <div class="home-workspace converter-preview">
+        <div class="workspace-topline">
+          <span class="workspace-mark"><i class="bi bi-file-earmark-arrow-up"></i></span>
+          <span>QUICK CONVERSION</span>
+          <span class="converter-live"><i></i> READY</span>
+        </div>
+        <div class="workspace-intro">
+          <span>Your workflow, simplified</span>
+          <h2>From file to finished in a few clicks.</h2>
+        </div>
+        <div class="converter-file-flow" aria-hidden="true">
+          <div class="converter-file-card">
+            <span class="converter-file-icon converter-file-pdf"><i class="bi bi-file-earmark-pdf-fill"></i></span>
+            <strong>your-file.pdf</strong>
+            <small>PDF document</small>
           </div>
-          <div class="hero-card-modern hero-card-2">
-            <div class="hero-card-icon-modern">
-              <i class="bi bi-file-earmark-image-fill"></i>
-            </div>
-            <div class="hero-card-content-modern">
-              <div class="hero-card-title-modern">Image to PDF</div>
-              <div class="hero-card-status-modern status-free">Free</div>
-            </div>
-          </div>
-          <div class="hero-card-modern hero-card-3">
-            <div class="hero-card-icon-modern">
-              <i class="bi bi-journal-bookmark-fill"></i>
-            </div>
-            <div class="hero-card-content-modern">
-              <div class="hero-card-title-modern">Revision Notes</div>
-              <div class="hero-card-status-modern status-available">Available</div>
-            </div>
-          </div>
-          <div class="hero-card-modern hero-card-4">
-            <div class="hero-card-icon-modern">
-              <i class="bi bi-briefcase-fill"></i>
-            </div>
-            <div class="hero-card-content-modern">
-              <div class="hero-card-title-modern">Teaching Jobs</div>
-              <div class="hero-card-status-modern status-new">New</div>
-            </div>
+          <span class="converter-flow-arrow"><i class="bi bi-arrow-right"></i></span>
+          <div class="converter-file-card">
+            <span class="converter-file-icon converter-file-word"><i class="bi bi-file-earmark-word-fill"></i></span>
+            <strong>your-file.docx</strong>
+            <small>Word document</small>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
-     FEATURES SECTION
-     ============================================================ -->
-<section class="features-section-modern">
-  <div class="container">
-    <div class="features-header-modern">
-      <span class="features-badge-modern">Powerful Features</span>
-      <h2 class="features-heading-modern">Everything You Need in One Place</h2>
-      <p class="features-subheading-modern">
-        From document conversion to job hunting — we've got you covered
-      </p>
-    </div>
-    <div class="features-grid-modern">
-      <div class="feature-card-modern feature-purple">
-        <div class="feature-icon-modern">
-          <i class="bi bi-arrow-repeat"></i>
-        </div>
-        <h3 class="feature-title-modern">Document Converter</h3>
-        <p class="feature-desc-modern">Convert PDFs to Word, PPTX, HTML, TXT, JSON, CSV and more with OCR support</p>
-        <a href="#converter" class="feature-link-modern">
-          <span>Start Converting</span>
-          <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-      <div class="feature-card-modern feature-green">
-        <div class="feature-icon-modern">
-          <i class="bi bi-filetype-pdf"></i>
-        </div>
-        <h3 class="feature-title-modern">Free PDF Tools</h3>
-        <p class="feature-desc-modern">Word & Image to PDF conversion — completely free, no payment required</p>
-        <a href="#free-tools" class="feature-link-modern">
-          <span>Convert Free</span>
-          <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-      <div class="feature-card-modern feature-blue">
-        <div class="feature-icon-modern">
-          <i class="bi bi-tools"></i>
-        </div>
-        <h3 class="feature-title-modern">PDF Utilities</h3>
-        <p class="feature-desc-modern">14 powerful tools: merge, split, compress, rotate, crop, and more</p>
-        <a href="#pdf-tools" class="feature-link-modern">
-          <span>Explore Tools</span>
-          <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-      <div class="feature-card-modern feature-orange">
-        <div class="feature-icon-modern">
-          <i class="bi bi-book"></i>
-        </div>
-        <h3 class="feature-title-modern">Revision Materials</h3>
-        <p class="feature-desc-modern">CBC & 8-4-4 notes, past papers, and comprehensive study resources</p>
-        <a href="{% url 'revision_home' %}" class="feature-link-modern">
-          <span>Browse Library</span>
-          <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-      <div class="feature-card-modern feature-pink">
-        <div class="feature-icon-modern">
-          <i class="bi bi-calendar-week"></i>
-        </div>
-        <h3 class="feature-title-modern">Scheme Generator</h3>
-        <p class="feature-desc-modern">Generate professional lesson schemes instantly for your class</p>
-        <a href="{% url 'sow_generator' %}" class="feature-link-modern">
-          <span>Generate Now</span>
-          <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-      <div class="feature-card-modern feature-cyan">
-        <div class="feature-icon-modern">
-          <i class="bi bi-briefcase"></i>
-        </div>
-        <h3 class="feature-title-modern">Teaching Jobs</h3>
-        <p class="feature-desc-modern">Find BOM and homeschooling teaching opportunities across Kenya</p>
-        <a href="#jobs" class="feature-link-modern">
-          <span>View Jobs</span>
-          <i class="bi bi-arrow-right"></i>
-        </a>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
-     JOB ADVERTISEMENTS SECTION
-     ============================================================ -->
-<section id="jobs" class="jobs-section-modern">
-  <div class="container">
-    <div class="jobs-header-modern">
-      <span class="jobs-badge-modern">🎯 Job Opportunities</span>
-      <h2 class="jobs-heading-modern">Find Your Next Teaching Job</h2>
-      <p class="jobs-subheading-modern">Connect with schools and families across Kenya</p>
-      <a href="{% url 'post_job' %}" class="btn-post-job-modern">
-        <i class="bi bi-plus-circle"></i> Post a Job
-      </a>
-    </div>
-    <div class="jobs-carousel-modern" id="jobsCarousel">
-      {% if featured_jobs %}
-        {% for job in featured_jobs %}
-          <div class="job-card-modern {% if job.job_type == 'bom' %}job-bom{% else %}job-homeschool{% endif %} job-carousel-item" data-index="{{ forloop.counter0 }}">
-            <div class="job-card-badge-modern">
-              {% if job.job_type == 'bom' %}
-                <i class="bi bi-mortarboard-fill"></i> BOM
-              {% else %}
-                <i class="bi bi-house-door-fill"></i> Homeschool
-              {% endif %}
-            </div>
-            <h3 class="job-card-title-modern">{{ job.title }}</h3>
-            <p class="job-card-school-modern">{{ job.school_name }}</p>
-            <div class="job-card-details-modern">
-              <span class="job-detail-modern">
-                <i class="bi bi-geo-alt"></i> {{ job.location }}
-              </span>
-              <span class="job-detail-modern">
-                <i class="bi bi-cash-stack"></i> {{ job.salary_range }}
-              </span>
-              <span class="job-detail-modern">
-                <i class="bi bi-clock"></i> {{ job.get_employment_type_display }}
-              </span>
-            </div>
-            <p class="job-card-desc-modern">{{ job.description|truncatewords:15 }}</p>
-            <a href="{% if job.job_type == 'bom' %}{% url 'bom_jobs' %}{% else %}{% url 'homeschooling_jobs' %}{% endif %}" class="btn-apply-job-modern">
-              View Details <i class="bi bi-arrow-right"></i>
-            </a>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="job-card-modern job-bom job-carousel-item" data-index="0">
-          <div class="job-card-badge-modern">
-            <i class="bi bi-mortarboard-fill"></i> BOM
-          </div>
-          <h3 class="job-card-title-modern">BOM Teaching Jobs</h3>
-          <p class="job-card-school-modern">Board of Management Schools</p>
-          <div class="job-card-details-modern">
-            <span class="job-detail-modern"><i class="bi bi-geo-alt"></i> Nationwide</span>
-            <span class="job-detail-modern"><i class="bi bi-cash-stack"></i> Competitive</span>
-          </div>
-          <p class="job-card-desc-modern">Exciting teaching opportunities in Board of Management schools across Kenya</p>
-          <a href="{% url 'bom_jobs' %}" class="btn-apply-job-modern">
-            View Jobs <i class="bi bi-arrow-right"></i>
+        <div class="converter-preview-divider"></div>
+        <div class="workspace-links">
+          <a href="#converter" class="workspace-link">
+            <span class="workspace-link-icon workspace-icon-purple"><i class="bi bi-file-earmark-pdf"></i></span>
+            <span><strong>Convert a document</strong><small>PDF to Word and more</small></span>
+            <i class="bi bi-arrow-up-right workspace-arrow"></i>
+          </a>
+          <a href="#free-tools" class="workspace-link">
+            <span class="workspace-link-icon workspace-icon-green"><i class="bi bi-filetype-pdf"></i></span>
+            <span><strong>Free file conversion</strong><small>Word or image to PDF</small></span>
+            <i class="bi bi-arrow-up-right workspace-arrow"></i>
+          </a>
+          <a href="#pdf-tools" class="workspace-link">
+            <span class="workspace-link-icon workspace-icon-amber"><i class="bi bi-tools"></i></span>
+            <span><strong>Work with a PDF</strong><small>Merge, split, compress, and more</small></span>
+            <i class="bi bi-arrow-up-right workspace-arrow"></i>
           </a>
         </div>
-        <div class="job-card-modern job-homeschool job-carousel-item" data-index="1">
-          <div class="job-card-badge-modern">
-            <i class="bi bi-house-door-fill"></i> Homeschool
-          </div>
-          <h3 class="job-card-title-modern">Homeschooling Jobs</h3>
-          <p class="job-card-school-modern">Private Education</p>
-          <div class="job-card-details-modern">
-            <span class="job-detail-modern"><i class="bi bi-geo-alt"></i> Flexible</span>
-            <span class="job-detail-modern"><i class="bi bi-cash-stack"></i> Great Rates</span>
-          </div>
-          <p class="job-card-desc-modern">Connect with families seeking qualified homeschooling tutors</p>
-          <a href="{% url 'homeschooling_jobs' %}" class="btn-apply-job-modern">
-            View Jobs <i class="bi bi-arrow-right"></i>
-          </a>
-        </div>
-      {% endif %}
-    </div>
-    {% if featured_jobs %}
-      <div class="jobs-nav-modern">
-        <button class="jobs-nav-btn-modern jobs-prev-modern" id="jobsPrev">
-          <i class="bi bi-chevron-left"></i>
-        </button>
-        <div class="jobs-dots-modern" id="jobsDots"></div>
-        <button class="jobs-nav-btn-modern jobs-next-modern" id="jobsNext">
-          <i class="bi bi-chevron-right"></i>
-        </button>
+        <div class="workspace-footnote"><i class="bi bi-shield-check"></i> Simple, secure, and ready when you are</div>
       </div>
-    {% endif %}
+    </div>
   </div>
 </section>
 
@@ -403,7 +194,7 @@
     <div class="converter-header-new animate-fade-in">
       <span class="converter-badge-new">Document Converter</span>
       <h2 class="converter-heading-new">Upload and convert your files</h2>
-      <p class="converter-subheading-new">Support for PDF, PNG, JPG, GIF, BMP formats</p>
+      <p class="converter-subheading-new">Convert PDFs to editable Word documents while preserving page layout, or extract content into other formats.</p>
     </div>
     <div class="converter-wrapper-new animate-fade-in">
       <div class="converter-main-new">
@@ -412,8 +203,8 @@
             <i class="bi bi-cloud-arrow-up"></i>
           </div>
           <h4 class="converter-upload-title-new">Drop file to upload</h4>
-          <p class="converter-upload-text-new">or click to browse &middot; PDF, PNG, JPG, GIF, BMP</p>
-          <input type="file" id="pdfFile" accept=".pdf,.png,.jpg,.jpeg,.bmp,.gif" style="display:none;">
+          <p class="converter-upload-text-new">or click to browse &middot; PDF, PNG, JPG, GIF, BMP, TIFF, WebP</p>
+          <input type="file" id="pdfFile" accept=".pdf,.png,.jpg,.jpeg,.bmp,.gif,.tif,.tiff,.webp" style="display:none;">
           {% csrf_token %}
           <button type="button" class="btn-upload-new" id="chooseFileBtn">
             <i class="bi bi-folder2-open"></i> Choose File
@@ -442,7 +233,6 @@
               <label class="option-label-new">Output Format</label>
               <select class="option-select-new" id="outputFormat">
                 <option value="docx">Word Document (.docx)</option>
-                <option value="doc">Word 97-2003 (.doc)</option>
                 <option value="txt">Text File (.txt)</option>
                 <option value="html">HTML Document (.html)</option>
                 <option value="json">JSON Data (.json)</option>
@@ -530,7 +320,7 @@
             <label class="pdf-form-label-new">Select Tool</label>
             <select class="pdf-form-select-new" id="pdfToolSelect" name="tool">
               <option value="merge">Merge PDFs</option>
-              <option value="split">Split PDF</option>
+              <option value="split">Split PDF into individual pages</option>
               <option value="compress">Compress PDF</option>
               <option value="rotate">Rotate PDF</option>
               <option value="watermark">Add Watermark</option>
@@ -552,9 +342,10 @@
               <div class="pdf-upload-content-new">
                 <i class="bi bi-cloud-arrow-up"></i>
                 <p>Drop PDF files here or click to browse</p>
-                <small>Hold Ctrl/Cmd to select multiple files</small>
+                <small id="pdfToolFilesMode">Select one PDF file</small>
               </div>
             </div>
+            <small id="pdfToolFilesHint" class="pdf-form-hint-new">Choose a PDF file.</small>
             <div id="pdfToolFilesList" class="pdf-files-list-new"></div>
           </div>
           <div class="pdf-form-row-new pdf-options-row-new" id="pdfOptionsRow" style="display:none;">
@@ -569,6 +360,7 @@
             <input type="password" class="pdf-form-input-new" id="passwordInput" name="password" placeholder="Password (min 4 chars)" style="display:none;">
             <input type="number" class="pdf-form-input-new" id="scaleInput" name="scale" placeholder="Scale % (e.g. 50)" style="display:none;" min="1" max="200">
             <input type="text" class="pdf-form-input-new" id="cropBoxInput" name="crop_box" placeholder="left,bottom,right,top" style="display:none;">
+            <input type="text" class="pdf-form-input-new" id="pageOrderInput" name="page_order" placeholder="Page order, e.g. 3,1,2" style="display:none;">
           </div>
           <div class="pdf-form-actions-new">
             <button type="submit" class="btn-pdf-submit-new" id="pdfToolBtn">
@@ -584,35 +376,13 @@
 </section>
 
 <!-- ============================================================
-     SCHEME OF WORK SECTION
-     ============================================================ -->
-<section class="sow-section">
-  <div class="container">
-    <div class="sow-card animate-fade-in">
-      <div class="sow-content">
-        <div class="sow-left">
-          <span class="sow-badge"><i class="bi bi-mortarboard"></i> Teacher Tool</span>
-          <h3 class="sow-title">Scheme of Work Generator</h3>
-          <p class="sow-desc">Generate lesson schemes for your class. Enter class, subject, topics, and download instantly as a formatted document.</p>
-        </div>
-        <div class="sow-right">
-          <a href="{% url 'sow_generator' %}" class="btn-sow">
-            <i class="bi bi-file-earmark-plus"></i> Generate Scheme
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ============================================================
      CTA SECTION
      ============================================================ -->
 <section class="cta-section-new">
   <div class="container">
     <div class="cta-content animate-fade-in">
-      <h2 class="cta-heading">Ready to get started?</h2>
-      <p class="cta-text">Create an account to access premium features, save your conversion history, and unlock the full revision library.</p>
+      <h2 class="cta-heading">Your next file is ready.</h2>
+      <p class="cta-text">Create an account to save your conversion history and get more from your document tools.</p>
       <div class="cta-buttons">
         <a href="{% url 'user_register' %}" class="btn-cta-primary">
           <i class="bi bi-person-plus"></i> Create Free Account
@@ -624,6 +394,7 @@
     </div>
   </div>
 </section>
+ </div>
 
 <!-- ============================================================
      SCRIPTS
@@ -650,7 +421,7 @@ const errorMessage = document.getElementById('errorMessage');
 const convertBtn = document.getElementById('convertBtn');
 
 const formatNames = {
-    'docx': 'Word Document', 'doc': 'Word 97-2003', 'txt': 'Text File',
+    'docx': 'Word Document', 'txt': 'Text File',
     'html': 'HTML Document', 'json': 'JSON Data', 'csv': 'CSV Spreadsheet',
     'pptx': 'PowerPoint Presentation'
 };
@@ -663,7 +434,7 @@ uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dr
 uploadArea.addEventListener('drop', (e) => {
     e.preventDefault(); uploadArea.classList.remove('dragover');
     const file = e.dataTransfer.files[0];
-    if (file && /(\.pdf|\.png|\.jpg|\.jpeg|\.bmp|\.gif)$/i.test(file.name)) handleFile(file);
+    if (file && /(\.pdf|\.png|\.jpg|\.jpeg|\.bmp|\.gif|\.tif|\.tiff|\.webp)$/i.test(file.name)) handleFile(file);
     else showError('Please select a PDF or Image file');
 });
 pdfFile.addEventListener('change', (e) => { if (e.target.files.length) handleFile(e.target.files[0]); });
@@ -677,6 +448,16 @@ function handleFile(file) {
     const pages = Math.max(1, Math.ceil(file.size / (50 * 1024)));
     document.getElementById('estimatedPages').textContent = pages;
     document.getElementById('estimatedCost').textContent = (pages * 2).toFixed(2);
+    const isImage = /\.(png|jpe?g|bmp|gif|tiff?|webp)$/i.test(file.name);
+    Array.from(outputFormat.options).forEach((option) => {
+        option.disabled = isImage && option.value !== 'docx';
+    });
+    if (isImage) {
+        outputFormat.value = 'docx';
+        document.querySelector('.option-label-new').textContent = 'Output Format (images are converted to Word)';
+    } else {
+        document.querySelector('.option-label-new').textContent = 'Output Format';
+    }
 }
 
 function clearFile() {
@@ -684,6 +465,8 @@ function clearFile() {
     fileInfo.style.display = 'none';
     resultContainer.style.display = 'none';
     errorContainer.style.display = 'none';
+    Array.from(outputFormat.options).forEach((option) => { option.disabled = false; });
+    document.querySelector('.option-label-new').textContent = 'Output Format';
 }
 
 function formatFileSize(bytes) {
@@ -712,7 +495,13 @@ async function convertPdf() {
 
     try {
         const r = await fetch('/upload/', { method: 'POST', body: fd });
-        const d = await r.json();
+        const responseText = await r.text();
+        let d;
+        try {
+            d = JSON.parse(responseText);
+        } catch {
+            throw new Error(`Converter returned an unexpected response (${r.status}). Please try again or contact support.`);
+        }
         console.log('Response:', d);
         console.log('Download URL:', d.download_url);
         console.log('Filename:', d.filename);
@@ -748,9 +537,9 @@ async function convertPdf() {
         } else {
             showError(d.error || 'Conversion failed');
         }
-    } catch (e) { 
+    } catch (e) {
         console.error('Fetch error:', e);
-        showError(e.message || 'An error occurred'); 
+        showError(e instanceof TypeError ? 'Could not connect to the converter. Check that the site is online, then try again.' : (e.message || 'An error occurred'));
     }
     finally {
         convertBtn.disabled = false;
@@ -817,9 +606,10 @@ async function convertDocxToPdf() {
             btn.download = d.filename;
             btn.textContent = 'Download ' + d.filename;
             docxResultContainer.style.display = 'block';
-            setTimeout(() => { btn.click(); }, 500);
         } else showDocxError(d.error || 'Conversion failed');
-    } catch (e) { showDocxError('An error occurred'); }
+    } catch (e) {
+        showDocxError(e instanceof TypeError ? 'Could not connect to the converter. Check that the site is online, then try again.' : (e.message || 'An error occurred'));
+    }
     finally {
         convertDocxBtn.disabled = false;
         convertDocxBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Convert to PDF';
@@ -831,6 +621,41 @@ function showDocxError(msg) {
     document.getElementById('docxErrorMessage').textContent = msg;
     document.getElementById('docxErrorContainer').style.display = 'block';
 }
+
+async function downloadConvertedFile(url, filename, showError) {
+    try {
+        const response = await fetch(url, { credentials: 'same-origin' });
+        if (!response.ok) {
+            const detail = await response.text();
+            throw new Error(detail || `Download failed (${response.status}). Please convert the file again.`);
+        }
+
+        const file = await response.blob();
+        if (!file.size) {
+            throw new Error('The converted file is empty. Please convert it again.');
+        }
+
+        const objectUrl = URL.createObjectURL(file);
+        const downloadLink = document.createElement('a');
+        downloadLink.href = objectUrl;
+        downloadLink.download = filename;
+        downloadLink.hidden = true;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        downloadLink.remove();
+        window.setTimeout(() => URL.revokeObjectURL(objectUrl), 60000);
+    } catch (error) {
+        showError(error instanceof TypeError
+            ? 'Could not download the file. Check your connection and try again.'
+            : (error.message || 'Download failed. Please try again.'));
+    }
+}
+
+document.getElementById('docxDownloadBtn').addEventListener('click', (event) => {
+    event.preventDefault();
+    const link = event.currentTarget;
+    downloadConvertedFile(link.href, link.download, showDocxError);
+});
 
 // =================== FREE IMAGE TO PDF CONVERTER ===================
 const imageUploadArea = document.getElementById('imageUploadArea');
@@ -885,9 +710,10 @@ async function convertImageToPdf() {
             btn.download = d.filename;
             btn.textContent = 'Download ' + d.filename;
             imageResultContainer.style.display = 'block';
-            setTimeout(() => { btn.click(); }, 500);
         } else showImageError(d.error || 'Conversion failed');
-    } catch (e) { showImageError('An error occurred'); }
+    } catch (e) {
+        showImageError(e instanceof TypeError ? 'Could not connect to the converter. Check that the site is online, then try again.' : (e.message || 'An error occurred'));
+    }
     finally {
         convertImageBtn.disabled = false;
         convertImageBtn.innerHTML = '<i class="bi bi-arrow-repeat me-1"></i> Convert to PDF';
@@ -900,6 +726,12 @@ function showImageError(msg) {
     document.getElementById('imageErrorContainer').style.display = 'block';
 }
 
+document.getElementById('imageDownloadBtn').addEventListener('click', (event) => {
+    event.preventDefault();
+    const link = event.currentTarget;
+    downloadConvertedFile(link.href, link.download, showImageError);
+});
+
 // =================== PDF TOOLS ===================
 const pdfToolForm = document.getElementById('pdfToolForm');
 const pdfToolSelect = document.getElementById('pdfToolSelect');
@@ -911,6 +743,7 @@ const watermarkInput = document.getElementById('watermarkInput');
 const passwordInput = document.getElementById('passwordInput');
 const scaleInput = document.getElementById('scaleInput');
 const cropBoxInput = document.getElementById('cropBoxInput');
+const pageOrderInput = document.getElementById('pageOrderInput');
 const pdfToolHint = document.getElementById('pdfToolHint');
 const pdfToolStatus = document.getElementById('pdfToolStatus');
 
@@ -925,15 +758,27 @@ function updatePdfToolInputs() {
     const tool = pdfToolSelect.value;
     const showMultiple = tool === 'merge' || tool === 'organize';
     pdfToolFiles.multiple = showMultiple;
-    pdfToolFiles.setAttribute('multiple', '');
+    if (showMultiple) {
+        pdfToolFiles.setAttribute('multiple', '');
+    } else {
+        pdfToolFiles.removeAttribute('multiple');
+    }
     if (showMultiple) {
         pdfToolFiles.setAttribute('data-mode', 'multi');
+        document.getElementById('pdfToolFilesMode').textContent = 'Hold Ctrl/Cmd to select multiple files';
     } else {
         pdfToolFiles.removeAttribute('data-mode');
+        document.getElementById('pdfToolFilesMode').textContent = 'Select one PDF file';
+        if (pdfToolFiles.files.length > 1) {
+            const transfer = new DataTransfer();
+            transfer.items.add(pdfToolFiles.files[0]);
+            pdfToolFiles.files = transfer.files;
+            pdfToolFiles.dispatchEvent(new Event('change'));
+        }
     }
     
     // Show options row if tool requires options
-    const toolsWithOptions = ['split', 'rotate', 'watermark', 'unlock', 'protect', 'resize', 'crop', 'page_remover', 'extract_pages'];
+    const toolsWithOptions = ['split', 'rotate', 'watermark', 'unlock', 'protect', 'resize', 'crop', 'organize', 'page_remover', 'extract_pages'];
     document.getElementById('pdfOptionsRow').style.display = toolsWithOptions.includes(tool) ? 'block' : 'none';
     
     pageRangeInput.style.display = (tool === 'split' || tool === 'page_remover' || tool === 'extract_pages') ? 'block' : 'none';
@@ -942,10 +787,17 @@ function updatePdfToolInputs() {
     passwordInput.style.display = (tool === 'unlock' || tool === 'protect') ? 'block' : 'none';
     scaleInput.style.display = tool === 'resize' ? 'block' : 'none';
     cropBoxInput.style.display = tool === 'crop' ? 'block' : 'none';
+    pageOrderInput.style.display = tool === 'organize' ? 'block' : 'none';
     if (tool === 'merge') {
         pdfToolHint.textContent = 'Select at least two PDFs to merge.';
     } else if (tool === 'organize') {
-        pdfToolHint.textContent = 'Select two or more PDFs to organize.';
+        pdfToolHint.textContent = 'Enter every page number in the new order. Pages are numbered across the selected files in upload order.';
+    } else if (tool === 'split') {
+        pdfToolHint.textContent = 'Enter pages to split (e.g. 1-3,5). Each selected page is saved as a separate PDF in a ZIP.';
+    } else if (tool === 'compress') {
+        pdfToolHint.textContent = 'Optimize PDF streams without reducing image quality; already optimized files may not get smaller.';
+    } else if (tool === 'flatten') {
+        pdfToolHint.textContent = 'Flatten pages into images at 150 DPI. Text and form fields will no longer be editable.';
     } else if (tool === 'page_remover') {
         pdfToolHint.textContent = 'Specify pages to remove (e.g. 1,3,5-7).';
     } else if (tool === 'extract_pages') {
@@ -1065,7 +917,7 @@ if (jobsCarousel && jobsPrev && jobsNext) {
 
 pdfToolFiles.addEventListener('change', () => {
     const count = pdfToolFiles.files.length;
-    const label = count > 0 ? `${count} file${count > 1 ? 's' : ''} selected` : 'Select one or more PDF files. Hold Ctrl (or Cmd) to select multiple files.';
+    const label = count > 0 ? `${count} file${count > 1 ? 's' : ''} selected` : 'Choose a PDF file.';
     document.getElementById('pdfToolFilesHint').textContent = label;
     const list = document.getElementById('pdfToolFilesList');
     list.innerHTML = '';
@@ -1074,12 +926,36 @@ pdfToolFiles.addEventListener('change', () => {
         Array.from(pdfToolFiles.files).forEach((file, index) => {
             const item = document.createElement('div');
             item.className = 'file-item';
-            item.innerHTML = `<i class="bi bi-file-earmark-pdf"></i><span>${index + 1}. ${file.name}</span><small>${(file.size / 1024 / 1024).toFixed(2)} MB</small><i class="bi bi-x" onclick="this.parentElement.remove()"></i>`;
+            const name = document.createElement('span');
+            name.textContent = `${index + 1}. ${file.name}`;
+            const size = document.createElement('small');
+            size.textContent = `${(file.size / 1024 / 1024).toFixed(2)} MB`;
+            item.append(name, size);
             list.appendChild(item);
         });
     } else {
         list.style.display = 'none';
     }
+});
+
+['dragenter', 'dragover'].forEach((eventName) => {
+    pdfUploadArea.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        pdfUploadArea.classList.add('dragging');
+    });
+});
+['dragleave', 'drop'].forEach((eventName) => {
+    pdfUploadArea.addEventListener(eventName, (event) => {
+        event.preventDefault();
+        pdfUploadArea.classList.remove('dragging');
+    });
+});
+pdfUploadArea.addEventListener('drop', (event) => {
+    const files = Array.from(event.dataTransfer.files).filter((file) => file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'));
+    const transfer = new DataTransfer();
+    (pdfToolFiles.multiple ? files : files.slice(0, 1)).forEach((file) => transfer.items.add(file));
+    pdfToolFiles.files = transfer.files;
+    pdfToolFiles.dispatchEvent(new Event('change'));
 });
 
 pdfToolForm.addEventListener('submit', async (e) => {
@@ -1089,8 +965,12 @@ pdfToolForm.addEventListener('submit', async (e) => {
         pdfToolHint.textContent = 'Please select at least two PDF files to merge.';
         return;
     }
-    if (tool === 'organize' && pdfToolFiles.files.length < 2) {
-        pdfToolHint.textContent = 'Please select at least two PDF files to organize.';
+    if (['split', 'page_remover', 'extract_pages'].includes(tool) && !pageRangeInput.value.trim()) {
+        pdfToolHint.textContent = 'Enter the page numbers or ranges to process.';
+        return;
+    }
+    if (tool === 'organize' && !pageOrderInput.value.trim()) {
+        pdfToolHint.textContent = 'Enter the desired page order.';
         return;
     }
     const fd = new FormData();
@@ -1101,7 +981,10 @@ pdfToolForm.addEventListener('submit', async (e) => {
     fd.append('password', passwordInput.value);
     fd.append('scale', scaleInput.value);
     fd.append('crop_box', cropBoxInput.value);
-    Array.from(pdfToolFiles.files).forEach((file) => fd.append('pdf_files', file));
+    fd.append('page_order', pageOrderInput.value);
+    const selectedFiles = Array.from(pdfToolFiles.files);
+    (tool === 'merge' || tool === 'organize' ? selectedFiles : selectedFiles.slice(0, 1))
+        .forEach((file) => fd.append('pdf_files', file));
     const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]');
     if (csrfToken) {
         fd.append('csrfmiddlewaretoken', csrfToken.value);
@@ -1114,7 +997,8 @@ pdfToolForm.addEventListener('submit', async (e) => {
     pdfToolStatus.innerHTML = '<i class="bi bi-hourglass-split me-2"></i> Processing your PDF…';
 
     try {
-        const response = await fetch(`/pdf-tools/${tool}/`, { method: 'POST', body: fd });
+        const routeNames = { page_remover: 'page-remover', extract_pages: 'extract-pages' };
+        const response = await fetch(`/pdf-tools/${routeNames[tool] || tool}/`, { method: 'POST', body: fd });
         let data;
         try {
             data = await response.json();
@@ -1124,14 +1008,22 @@ pdfToolForm.addEventListener('submit', async (e) => {
         }
         if (response.ok && data.success) {
             pdfToolStatus.className = 'alert alert-success';
-            pdfToolStatus.innerHTML = `<i class="bi bi-check-circle me-2"></i> Your PDF is ready. <a href="${data.download_url}" class="alert-link" download>Download ${data.filename}</a>`;
+            pdfToolStatus.textContent = tool === 'split' ? 'Your individual page PDFs are ready. ' : 'Your PDF is ready. ';
+            const link = document.createElement('a');
+            link.href = data.download_url;
+            link.className = 'alert-link';
+            link.download = data.filename;
+            link.textContent = `Download ${data.filename}`;
+            pdfToolStatus.appendChild(link);
         } else {
             pdfToolStatus.className = 'alert alert-danger';
-            pdfToolStatus.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>${data.error || 'The selected PDF tool failed.'}`;
+            pdfToolStatus.textContent = data.error || 'The selected PDF tool failed.';
         }
     } catch (error) {
         pdfToolStatus.className = 'alert alert-danger';
-        pdfToolStatus.innerHTML = `<i class="bi bi-exclamation-triangle me-2"></i>${error.message || 'An unexpected error occurred. Please check server logs.'}`;
+        pdfToolStatus.textContent = error instanceof TypeError
+            ? 'Could not connect to the converter. Check that the site is online, then try again.'
+            : (error.message || 'An unexpected error occurred. Please check server logs.');
     } finally {
         button.disabled = false;
         button.innerHTML = '<i class="bi bi-tools me-1"></i> Run Tool';

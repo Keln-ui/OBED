@@ -134,10 +134,10 @@
         <div class="content">
             <h2>Welcome to CoreSynch!</h2>
             <p>Hi {{ user.username }},</p>
-            <p>Thank you for registering with CoreSynch! Your account has been successfully created. Below are your login credentials:</p>
+            <p>Thank you for registering with CoreSynch! Your account has been successfully created.</p>
 
             <div class="credentials-box">
-                <h3>Your Account Credentials</h3>
+                <h3>Your Account</h3>
                 <div class="credential-item">
                     <div class="credential-label">Username:</div>
                     <div class="credential-value">{{ user.username }}</div>
@@ -146,23 +146,15 @@
                     <div class="credential-label">Email:</div>
                     <div class="credential-value">{{ user.email }}</div>
                 </div>
-                <div class="credential-item">
-                    <div class="credential-label">Password:</div>
-                    <div class="credential-value">{{ password }}</div>
-                </div>
             </div>
 
             <div class="info">
-                <p><strong>Important:</strong> Please save your password securely. You can change it after logging in to your account.</p>
+                <p>Your password is the one you chose during registration. For your security, it is not included in this email.</p>
             </div>
 
             <p style="text-align: center;">
-                <a href="http://{{ domain }}/login/" class="button">Login to Your Account</a>
+                <a href="{{ site_scheme }}://{{ domain }}/login/" class="button">Sign In to Your Account</a>
             </p>
-
-            <div class="warning">
-                <p><strong>Security Note:</strong> This password was auto-generated for your account. We recommend changing it to a password of your choice after your first login for better security.</p>
-            </div>
         </div>
         <div class="footer">
             <p>&copy; 2024 CoreSynch. All rights reserved.</p>

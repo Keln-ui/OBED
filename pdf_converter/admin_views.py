@@ -3,10 +3,20 @@ from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import User
 from django.db.models import Sum, Count, Q
 from django.utils import timezone
+from django.conf import settings
 from datetime import timedelta
 from django.contrib import messages
-from .models import ConvertedFile, Payment, SubscriptionPlan, SchoolSubscription, SchoolProfile, PaymentSettings
-from revision.models import Subject, RevisionMaterial
+from urllib.parse import urlsplit
+from .models import (
+    ConvertedFile,
+    JobAdvertisement,
+    Payment,
+    SubscriptionPlan,
+    SchoolSubscription,
+    SchoolProfile,
+    PaymentSettings,
+)
+from revision.models import SchemeOfWork, Subject, RevisionMaterial
 from .forms import SubscriptionPlanForm
 from .payment_utils import is_free_period, get_payment_settings
 
@@ -28,7 +38,44 @@ def staff_login_required(view_func):
 
 @staff_login_required
 def admin_dashboard(request):
-    """Custom admin dashboard with analytics"""
+    """Show the dashboard for the subdomain receiving the request."""
+    request_host = urlsplit(f'//{request.get_host()}').hostname
+    converter_host = urlsplit(f'//{settings.CONVERTER_HOST}').hostname
+    if request_host == converter_host:
+        return _converter_admin_dashboard(request)
+    return _academic_admin_dashboard(request)
+
+
+def _academic_admin_dashboard(request):
+    """Academic-site dashboard for learning content and teaching jobs."""
+    context = {
+        'total_subjects': Subject.objects.count(),
+        'total_materials': RevisionMaterial.objects.count(),
+        'total_downloads': RevisionMaterial.objects.aggregate(
+            total=Sum('download_count')
+        )['total'] or 0,
+        'total_schemes': SchemeOfWork.objects.count(),
+        'active_jobs': JobAdvertisement.objects.filter(
+            is_active=True,
+            approved=True,
+        ).count(),
+        'pending_jobs': JobAdvertisement.objects.filter(
+            is_active=True,
+            approved=False,
+        ).count(),
+        'recent_materials': RevisionMaterial.objects.select_related(
+            'subject'
+        ).order_by('-created_at')[:5],
+        'pending_job_list': JobAdvertisement.objects.filter(
+            is_active=True,
+            approved=False,
+        ).order_by('-created_at')[:5],
+    }
+    return render(request, 'admin/academic_dashboard.html', context)
+
+
+def _converter_admin_dashboard(request):
+    """Conversion and payment dashboard for the converter site."""
     
     # Date ranges
     today = timezone.now().date()
@@ -215,7 +262,7 @@ def admin_dashboard(request):
         'is_free_period': is_free_period(),
     }
     
-    return render(request, 'admin/dashboard.html', context)
+    return render(request, 'admin/converter_dashboard.html', context)
 
 
 # ---------------------------------------------------------------------------

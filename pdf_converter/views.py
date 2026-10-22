@@ -2,6 +2,8 @@ import os
 import shutil
 import tempfile
 import logging
+import uuid
+import zipfile
 from pathlib import Path
 from io import BytesIO
 from datetime import datetime, date, timedelta
@@ -13,10 +15,16 @@ from django.http import JsonResponse, HttpResponse, FileResponse
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.views import PasswordResetConfirmView
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.db.models import Sum, Count, Q
 from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import never_cache
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.generic import FormView
+from .context_processors import platform_links
 from PyPDF2 import PdfMerger, PdfReader, PdfWriter
 from .models import (
     ConvertedFile, Payment, 
@@ -26,10 +34,36 @@ from .forms import SchoolRegistrationForm, SubscriptionPaymentForm
 from .payment_utils import get_conversion_cost, payment_required_for_conversion
 
 
-def _build_pdf_tool_output_path(tool_name, source_name):
+def _build_pdf_tool_output_path(tool_name, source_name, extension='.pdf'):
     base_name = os.path.splitext(os.path.basename(source_name))[0]
-    timestamp = int(datetime.now().timestamp())
-    return os.path.join(settings.MEDIA_ROOT, 'converted', f'{tool_name}_{timestamp}_{base_name}.pdf')
+    unique_id = uuid.uuid4().hex[:10]
+    output_dir = os.path.join(settings.MEDIA_ROOT, 'converted')
+    os.makedirs(output_dir, exist_ok=True)
+    return os.path.join(output_dir, f'{tool_name}_{unique_id}_{base_name}{extension}')
+
+
+def _parse_pdf_page_range(page_range, page_count):
+    selected_pages = []
+    for part in page_range.split(','):
+        part = part.strip()
+        if not part:
+            continue
+        try:
+            if '-' in part:
+                start_text, end_text = part.split('-', 1)
+                start, end = int(start_text.strip()), int(end_text.strip())
+                if start > end:
+                    raise ValueError
+                selected_pages.extend(range(start, end + 1))
+            else:
+                selected_pages.append(int(part))
+        except ValueError:
+            raise ValueError('Use page numbers and ranges such as 1,3-5.')
+    if not selected_pages:
+        raise ValueError('Please specify at least one page.')
+    if any(page < 1 or page > page_count for page in selected_pages):
+        raise ValueError(f'Page numbers must be between 1 and {page_count}.')
+    return list(dict.fromkeys(page - 1 for page in selected_pages))
 
 
 def _save_uploaded_pdf(uploaded_file, temp_dir):
@@ -62,27 +96,25 @@ def _safe_cleanup(temp_dir):
 # HOME
 # ---------------------------------------------------------------------------
 def index(request):
-    """Home page with file upload."""
-    from revision.models import RevisionMaterial, Class as SchoolClass
-    total_materials = RevisionMaterial.objects.count()
-    total_classes = SchoolClass.objects.count()
-    
-    # Get active job advertisements for homepage carousel (only approved jobs)
-    featured_jobs = JobAdvertisement.objects.filter(
-        is_active=True,
-        approved=True
-    ).exclude(
-        expires_at__lt=date.today()
-    ).order_by('-featured', '-created_at')[:6]
-    
-    context = {
-        'plans': SubscriptionPlan.objects.filter(is_active=True),
-        'total_formats': 7,
-        'total_materials': total_materials,
-        'total_classes': total_classes,
-        'featured_jobs': featured_jobs,
-    }
-    return render(request, 'index.html', context)
+    """Show the homepage for the subdomain receiving the request."""
+    is_converter_site = platform_links(request)['is_converter_site']
+    context = {'total_formats': 6}
+
+    if not is_converter_site:
+        from revision.models import RevisionMaterial
+
+        context.update({
+            'total_materials': RevisionMaterial.objects.count(),
+            'featured_jobs': JobAdvertisement.objects.filter(
+                is_active=True,
+                approved=True
+            ).exclude(
+                expires_at__lt=date.today()
+            ).order_by('-featured', '-created_at')[:6],
+        })
+
+    template_name = 'index.html' if is_converter_site else 'academic_index.html'
+    return render(request, template_name, context)
 
 
 # ---------------------------------------------------------------------------
@@ -94,11 +126,23 @@ def logout_view(request):
     return redirect('index')
 
 
+def google_login_entry(request):
+    """Start Google sign-in only when a Google OAuth app is configured."""
+    from allauth.socialaccount.adapter import get_adapter
+    from allauth.socialaccount.models import SocialApp
+
+    try:
+        get_adapter(request).get_app(request, provider='google')
+    except SocialApp.DoesNotExist:
+        return redirect(f"{reverse('login')}?google_unavailable=1")
+    return redirect('google_login')
+
+
 # ---------------------------------------------------------------------------
 # USER REGISTRATION (simple account for marking scheme downloads)
 # ---------------------------------------------------------------------------
 def user_register(request):
-    """Register a simple user account (not a school) with auto-generated password sent via email."""
+    """Register an individual account with a user-chosen password."""
     from .forms import SimpleUserRegistrationForm
     from django.core.mail import send_mail
     from django.template.loader import render_to_string
@@ -108,17 +152,16 @@ def user_register(request):
     if request.method == 'POST':
         form = SimpleUserRegistrationForm(request.POST)
         if form.is_valid():
-            user, password = form.save(commit=True)
-            user.is_active = True  # User is active immediately since password is sent via email
+            user = form.save(commit=False)
+            user.is_active = True
             user.save()
 
-            # Send email with credentials
             current_site = get_current_site(request)
-            subject = 'Welcome to CoreSynch - Your Account Credentials'
+            subject = 'Welcome to CoreSynch'
             message = render_to_string('registration/registration_email.html', {
                 'user': user,
-                'password': password,
                 'domain': current_site.domain,
+                'site_scheme': settings.SITE_SCHEME,
             })
 
             try:
@@ -130,12 +173,15 @@ def user_register(request):
                     fail_silently=False,
                     html_message=message,
                 )
-                messages.success(request, f'Registration successful! Your account credentials have been sent to {user.email}. Please check your inbox.')
-                return redirect('login')
+                messages.success(request, f'Registration successful! A welcome email has been sent to {user.email}.')
             except Exception as e:
-                messages.error(request, f'Failed to send registration email: {str(e)}')
-                user.delete()  # Delete user if email fails
-                return redirect('user_register')
+                logger.exception('Failed to send registration email for user %s', user.pk)
+                messages.warning(
+                    request,
+                    'Your account was created, but we could not send the welcome email. '
+                    'You can sign in with the password you chose.',
+                )
+            return redirect('login')
     else:
         form = SimpleUserRegistrationForm()
 
@@ -337,7 +383,18 @@ def upload_pdf(request):
     if not pdf_file:
         return JsonResponse({'error': 'No file uploaded'}, status=400)
     
-    output_format = request.POST.get('output_format', 'docx')
+    from .converters import ConverterFactory
+
+    output_format = request.POST.get('output_format', 'docx').lower()
+    if output_format not in ConverterFactory.SUPPORTED_FORMATS:
+        return JsonResponse({'error': 'Choose a supported output format.'}, status=400)
+    extension = os.path.splitext(pdf_file.name)[1].lower()
+    is_image = extension in ConverterFactory.IMAGE_EXTENSIONS
+    if extension != '.pdf' and not is_image:
+        return JsonResponse({'error': 'Upload a PDF or supported image file.'}, status=400)
+    if is_image and output_format != 'docx':
+        return JsonResponse({'error': 'Image uploads can currently be converted to Word (.docx) only.'}, status=400)
+
     use_ocr = request.POST.get('use_ocr') == 'true'
     
     # Create conversion record
@@ -350,14 +407,18 @@ def upload_pdf(request):
     
     # Count pages
     page_count = 1
-    try:
-        import PyPDF2
-        reader = PyPDF2.PdfReader(pdf_file)
-        page_count = len(reader.pages)
-        conversion.page_count = page_count
-        conversion.save()
-    except Exception:
-        pass
+    if not is_image:
+        try:
+            import PyPDF2
+            reader = PyPDF2.PdfReader(pdf_file)
+            page_count = len(reader.pages)
+            conversion.page_count = page_count
+            conversion.save()
+        except Exception as exc:
+            conversion.status = 'failed'
+            conversion.error_message = f'Could not read the PDF: {exc}'
+            conversion.save()
+            return JsonResponse({'error': conversion.error_message}, status=400)
     
     # Calculate cost
     total_cost = get_conversion_cost(page_count)
@@ -369,14 +430,12 @@ def upload_pdf(request):
     # Convert the file immediately
     error_msg = None
     try:
-        from .converters import ConverterFactory
-        
         # Get input file path - use the actual saved path
         input_path = Path(settings.MEDIA_ROOT) / 'pdfs' / os.path.basename(conversion.original_pdf.name)
         
         # Generate output filename
         base_name = os.path.splitext(os.path.basename(conversion.original_pdf.name))[0]
-        output_filename = f"{base_name}_converted.{output_format}"
+        output_filename = f"{base_name}_converted_{uuid.uuid4().hex[:10]}.{output_format}"
         output_dir = Path(settings.MEDIA_ROOT) / 'converted'
         output_path = output_dir / output_filename
         
@@ -390,7 +449,7 @@ def upload_pdf(request):
         if converter and converter.convert():
             # Save the converted file to Django's file field
             with open(output_path, 'rb') as f:
-                conversion.converted_file.save(f'converted/{output_filename}', f, save=False)
+                conversion.converted_file.save(output_filename, f, save=False)
             conversion.status = 'completed'
             if not requires_payment:
                 conversion.payment_status = 'paid'
@@ -806,8 +865,7 @@ def upload_docx_to_pdf(request):
     # Save uploaded file temporarily
     temp_dir = tempfile.mkdtemp()
     input_path = os.path.join(temp_dir, docx_file.name)
-    output_filename = os.path.splitext(docx_file.name)[0] + '.pdf'
-    output_path = os.path.join(settings.MEDIA_ROOT, 'converted', f'docx2pdf_{int(datetime.now().timestamp())}_{output_filename}')
+    output_path = _build_pdf_tool_output_path('docx2pdf', docx_file.name)
     
     try:
         with open(input_path, 'wb') as f:
@@ -824,11 +882,13 @@ def upload_docx_to_pdf(request):
             return JsonResponse({
                 'success': True,
                 'download_url': download_url,
-                'filename': output_filename,
+                'filename': os.path.basename(output_path),
                 'free': True,
             })
         else:
-            return JsonResponse({'error': 'Conversion failed. Please try again.'}, status=500)
+            return JsonResponse({
+                'error': converter.error_message or 'This Word document could not be converted. Check that it is a valid .docx file.',
+            }, status=422)
     except Exception as e:
         return JsonResponse({'error': f'Conversion error: {str(e)}'}, status=500)
     finally:
@@ -856,8 +916,7 @@ def upload_image_to_pdf(request):
     
     temp_dir = tempfile.mkdtemp()
     input_path = os.path.join(temp_dir, image_file.name)
-    output_filename = os.path.splitext(image_file.name)[0] + '.pdf'
-    output_path = os.path.join(settings.MEDIA_ROOT, 'converted', f'img2pdf_{int(datetime.now().timestamp())}_{output_filename}')
+    output_path = _build_pdf_tool_output_path('img2pdf', image_file.name)
     
     try:
         with open(input_path, 'wb') as f:
@@ -874,7 +933,7 @@ def upload_image_to_pdf(request):
         return JsonResponse({
             'success': True,
             'download_url': download_url,
-            'filename': output_filename,
+            'filename': os.path.basename(output_path),
             'free': True,
         })
     except Exception as e:
@@ -918,47 +977,35 @@ def pdf_tool_merge(request):
 
 
 def pdf_tool_split(request):
-    """Create a PDF containing the requested page range from an uploaded PDF."""
+    """Split selected pages into individual PDFs and return them in a ZIP archive."""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
 
     uploaded_file = request.FILES.get('pdf_files')
     if not uploaded_file:
         return JsonResponse({'error': 'No file uploaded'}, status=400)
+    if not uploaded_file.name.lower().endswith('.pdf'):
+        return JsonResponse({'error': 'Only PDF files are supported.'}, status=400)
 
     page_range = request.POST.get('page_range', '').strip()
+    if not page_range:
+        return JsonResponse({'error': 'Specify pages to split (e.g. 1-3,5).'}, status=400)
     temp_dir = tempfile.mkdtemp()
     try:
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
         reader = PdfReader(input_path)
-        selected_pages = []
-        if page_range:
-            for part in page_range.split(','):
-                part = part.strip()
-                if not part:
-                    continue
-                if '-' in part:
-                    start_text, end_text = part.split('-', 1)
-                    start = max(1, int(start_text.strip()))
-                    end = min(len(reader.pages), int(end_text.strip()))
-                    selected_pages.extend(range(start - 1, end))
-                else:
-                    selected_pages.append(int(part) - 1)
-        else:
-            selected_pages = [0]
-
-        selected_pages = sorted(set(selected_pages))
-        selected_pages = [page for page in selected_pages if 0 <= page < len(reader.pages)]
-        if not selected_pages:
-            return JsonResponse({'error': 'No valid pages were selected.'}, status=400)
-
-        writer = PdfWriter()
-        for page_number in selected_pages:
-            writer.add_page(reader.pages[page_number])
-        output_path = _build_pdf_tool_output_path('split', uploaded_file.name)
-        with open(output_path, 'wb') as handle:
-            writer.write(handle)
+        selected_pages = _parse_pdf_page_range(page_range, len(reader.pages))
+        output_path = _build_pdf_tool_output_path('split', uploaded_file.name, '.zip')
+        with zipfile.ZipFile(output_path, 'w', compression=zipfile.ZIP_DEFLATED) as archive:
+            for page_number in selected_pages:
+                writer = PdfWriter()
+                writer.add_page(reader.pages[page_number])
+                page_buffer = BytesIO()
+                writer.write(page_buffer)
+                archive.writestr(f'page_{page_number + 1}.pdf', page_buffer.getvalue())
         return _pdf_tool_response(request, output_path, 'split')
+    except ValueError as exc:
+        return JsonResponse({'error': str(exc)}, status=400)
     except Exception as exc:
         return JsonResponse({'error': f'Split failed: {str(exc)}'}, status=500)
     finally:
@@ -966,24 +1013,29 @@ def pdf_tool_split(request):
 
 
 def pdf_tool_compress(request):
-    """Rebuild a PDF in a compact form by rewriting its pages."""
+    """Compress PDF streams and remove unused objects without degrading image quality."""
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
 
     uploaded_file = request.FILES.get('pdf_files')
     if not uploaded_file:
         return JsonResponse({'error': 'No file uploaded'}, status=400)
+    if not uploaded_file.name.lower().endswith('.pdf'):
+        return JsonResponse({'error': 'Only PDF files are supported for compression.'}, status=400)
 
     temp_dir = tempfile.mkdtemp()
     try:
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
-        reader = PdfReader(input_path)
-        writer = PdfWriter()
-        for page in reader.pages:
-            writer.add_page(page)
+        import pikepdf
+
         output_path = _build_pdf_tool_output_path('compressed', uploaded_file.name)
-        with open(output_path, 'wb') as handle:
-            writer.write(handle)
+        with pikepdf.open(input_path) as pdf:
+            pdf.save(
+                output_path,
+                compress_streams=True,
+                recompress_flate=True,
+                object_stream_mode=pikepdf.ObjectStreamMode.generate,
+            )
         return _pdf_tool_response(request, output_path, 'compress')
     except Exception as exc:
         return JsonResponse({'error': f'Compression failed: {str(exc)}'}, status=500)
@@ -999,8 +1051,15 @@ def pdf_tool_rotate(request):
     uploaded_file = request.FILES.get('pdf_files')
     if not uploaded_file:
         return JsonResponse({'error': 'No file uploaded'}, status=400)
+    if not uploaded_file.name.lower().endswith('.pdf'):
+        return JsonResponse({'error': 'Only PDF files are supported for rotation.'}, status=400)
 
-    rotation = int(request.POST.get('rotation', '90'))
+    try:
+        rotation = int(request.POST.get('rotation', '90'))
+    except ValueError:
+        return JsonResponse({'error': 'Choose a rotation of 90, 180, or 270 degrees.'}, status=400)
+    if rotation not in (90, 180, 270):
+        return JsonResponse({'error': 'Choose a rotation of 90, 180, or 270 degrees.'}, status=400)
     temp_dir = tempfile.mkdtemp()
     try:
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
@@ -1027,6 +1086,8 @@ def pdf_tool_watermark(request):
     uploaded_file = request.FILES.get('pdf_files')
     if not uploaded_file:
         return JsonResponse({'error': 'No file uploaded'}, status=400)
+    if not uploaded_file.name.lower().endswith('.pdf'):
+        return JsonResponse({'error': 'Only PDF files are supported for watermarking.'}, status=400)
 
     watermark_text = request.POST.get('watermark_text', 'CONFIDENTIAL').strip() or 'CONFIDENTIAL'
     temp_dir = tempfile.mkdtemp()
@@ -1051,8 +1112,8 @@ def pdf_tool_watermark(request):
             watermark_buffer.seek(0)
             watermark_reader = PdfReader(watermark_buffer)
             watermarked_page = watermark_reader.pages[0]
-            watermarked_page.merge_page(page)
-            writer.add_page(watermarked_page)
+            page.merge_page(watermarked_page)
+            writer.add_page(page)
 
         output_path = _build_pdf_tool_output_path('watermarked', uploaded_file.name)
         with open(output_path, 'wb') as handle:
@@ -1079,13 +1140,20 @@ def pdf_tool_flatten(request):
     temp_dir = tempfile.mkdtemp()
     try:
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
-        reader = PdfReader(input_path)
-        writer = PdfWriter()
-        for page in reader.pages:
-            writer.add_page(page)
+        import fitz
+
         output_path = _build_pdf_tool_output_path('flattened', uploaded_file.name)
-        with open(output_path, 'wb') as handle:
-            writer.write(handle)
+        source = fitz.open(input_path)
+        flattened = fitz.open()
+        try:
+            for page in source:
+                pixmap = page.get_pixmap(matrix=fitz.Matrix(150 / 72, 150 / 72), alpha=False)
+                new_page = flattened.new_page(width=page.rect.width, height=page.rect.height)
+                new_page.insert_image(new_page.rect, pixmap=pixmap)
+            flattened.save(output_path, garbage=4, deflate=True)
+        finally:
+            flattened.close()
+            source.close()
         return _pdf_tool_response(request, output_path, 'flatten')
     except Exception as exc:
         return JsonResponse({'error': f'Flatten failed: {str(exc)}'}, status=500)
@@ -1103,6 +1171,8 @@ def pdf_tool_resize(request):
         return JsonResponse({'error': 'Only PDF files are supported for resize.'}, status=400)
     try:
         scale_percent = float(request.POST.get('scale', '100'))
+        if not 1 <= scale_percent <= 200:
+            raise ValueError
         scale_factor = scale_percent / 100.0
     except ValueError:
         return JsonResponse({'error': 'Invalid scale percentage'}, status=400)
@@ -1138,9 +1208,7 @@ def pdf_tool_unlock(request):
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
         reader = PdfReader(input_path)
         if reader.is_encrypted:
-            try:
-                reader.decrypt(password)
-            except Exception:
+            if not reader.decrypt(password):
                 return JsonResponse({'error': 'Unable to decrypt PDF. Please check the password.'}, status=400)
         writer = PdfWriter()
         for page in reader.pages:
@@ -1199,6 +1267,8 @@ def pdf_tool_crop(request):
         coords = [float(x) for x in crop_box.split(',')]
         if len(coords) != 4:
             return JsonResponse({'error': 'Invalid crop box format. Use: left,bottom,right,top'}, status=400)
+        if coords[2] <= coords[0] or coords[3] <= coords[1]:
+            return JsonResponse({'error': 'Crop right/top values must be greater than left/bottom values.'}, status=400)
     except ValueError:
         return JsonResponse({'error': 'Invalid crop box values'}, status=400)
     temp_dir = tempfile.mkdtemp()
@@ -1224,9 +1294,11 @@ def pdf_tool_organize(request):
     if request.method != 'POST':
         return JsonResponse({'error': 'POST required'}, status=405)
     uploaded_files = request.FILES.getlist('pdf_files')
-    if len(uploaded_files) < 2:
-        return JsonResponse({'error': 'Please upload at least two PDF files to organize.'}, status=400)
-    page_orders = request.POST.getlist('page_order')
+    if not uploaded_files:
+        return JsonResponse({'error': 'Please upload at least one PDF to organize.'}, status=400)
+    page_order = request.POST.get('page_order', '').strip()
+    if not page_order:
+        return JsonResponse({'error': 'Enter the desired page order, such as 3,1,2.'}, status=400)
     temp_dir = tempfile.mkdtemp()
     try:
         all_pages = []
@@ -1237,9 +1309,18 @@ def pdf_tool_organize(request):
             reader = PdfReader(input_path)
             for page in reader.pages:
                 all_pages.append(page)
+        try:
+            order_parts = [value.strip() for value in page_order.split(',')]
+            if any(not value for value in order_parts):
+                raise ValueError
+            page_numbers = [int(value) for value in order_parts]
+        except ValueError:
+            return JsonResponse({'error': 'Page order must be a comma-separated list, such as 3,1,2.'}, status=400)
+        if len(page_numbers) != len(all_pages) or set(page_numbers) != set(range(1, len(all_pages) + 1)):
+            return JsonResponse({'error': f'Enter every page number from 1 to {len(all_pages)} exactly once.'}, status=400)
         writer = PdfWriter()
-        for page in all_pages:
-            writer.add_page(page)
+        for page_number in page_numbers:
+            writer.add_page(all_pages[page_number - 1])
         output_path = _build_pdf_tool_output_path('organized', uploaded_files[0].name)
         with open(output_path, 'wb') as handle:
             writer.write(handle)
@@ -1266,27 +1347,24 @@ def pdf_tool_extract_image(request):
             return JsonResponse({'error': 'PyMuPDF (fitz) not installed. Run: pip install PyMuPDF'}, status=500)
         
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
-        doc = fitz.open(input_path)
         extracted_images = []
-        for page_num in range(len(doc)):
-            try:
-                for img in doc[page_num].get_images():
-                    xref = img[0]
-                    try:
-                        base_image = doc.extract_image(xref)
-                        if base_image:
-                            image_bytes = base_image.get('image')
-                            image_ext = base_image.get('ext', 'png')
-                            if image_bytes:
-                                image_path = os.path.join(temp_dir, f'page_{page_num + 1}_img_{xref}.{image_ext}')
-                                with open(image_path, 'wb') as img_file:
-                                    img_file.write(image_bytes)
-                                extracted_images.append(image_path)
-                    except Exception:
+        seen_xrefs = set()
+        with fitz.open(input_path) as doc:
+            for page_num, page in enumerate(doc):
+                for image_info in page.get_images(full=True):
+                    xref = image_info[0]
+                    if xref in seen_xrefs:
                         continue
-            except Exception:
-                continue
-        doc.close()
+                    seen_xrefs.add(xref)
+                    base_image = doc.extract_image(xref)
+                    image_bytes = base_image.get('image')
+                    if not image_bytes:
+                        continue
+                    image_ext = base_image.get('ext', 'png')
+                    image_path = os.path.join(temp_dir, f'page_{page_num + 1}_img_{xref}.{image_ext}')
+                    with open(image_path, 'wb') as img_file:
+                        img_file.write(image_bytes)
+                    extracted_images.append(image_path)
         if not extracted_images:
             return JsonResponse({'error': 'No images found in PDF.'}, status=400)
         import zipfile
@@ -1323,18 +1401,9 @@ def pdf_tool_page_remover(request):
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
         reader = PdfReader(input_path)
         total_pages = len(reader.pages)
-        pages_to_remove = set()
-        for part in page_range.split(','):
-            part = part.strip()
-            if not part:
-                continue
-            if '-' in part:
-                start_text, end_text = part.split('-', 1)
-                start = max(1, int(start_text.strip()))
-                end = min(total_pages, int(end_text.strip()))
-                pages_to_remove.update(range(start, end + 1))
-            else:
-                pages_to_remove.add(int(part))
+        pages_to_remove = {page + 1 for page in _parse_pdf_page_range(page_range, total_pages)}
+        if len(pages_to_remove) == total_pages:
+            return JsonResponse({'error': 'You cannot remove every page from the PDF.'}, status=400)
         writer = PdfWriter()
         for i, page in enumerate(reader.pages):
             if (i + 1) not in pages_to_remove:
@@ -1343,6 +1412,8 @@ def pdf_tool_page_remover(request):
         with open(output_path, 'wb') as handle:
             writer.write(handle)
         return _pdf_tool_response(request, output_path, 'page_remover')
+    except ValueError as exc:
+        return JsonResponse({'error': str(exc)}, status=400)
     except Exception as exc:
         return JsonResponse({'error': f'Page removal failed: {str(exc)}'}, status=500)
     finally:
@@ -1364,22 +1435,7 @@ def pdf_tool_extract_pages(request):
     try:
         input_path = _save_uploaded_pdf(uploaded_file, temp_dir)
         reader = PdfReader(input_path)
-        selected_pages = []
-        for part in page_range.split(','):
-            part = part.strip()
-            if not part:
-                continue
-            if '-' in part:
-                start_text, end_text = part.split('-', 1)
-                start = max(1, int(start_text.strip()))
-                end = min(len(reader.pages), int(end_text.strip()))
-                selected_pages.extend(range(start - 1, end))
-            else:
-                selected_pages.append(int(part) - 1)
-        selected_pages = sorted(set(selected_pages))
-        selected_pages = [p for p in selected_pages if 0 <= p < len(reader.pages)]
-        if not selected_pages:
-            return JsonResponse({'error': 'No valid pages selected.'}, status=400)
+        selected_pages = _parse_pdf_page_range(page_range, len(reader.pages))
         writer = PdfWriter()
         for page_num in selected_pages:
             writer.add_page(reader.pages[page_num])
@@ -1387,6 +1443,8 @@ def pdf_tool_extract_pages(request):
         with open(output_path, 'wb') as handle:
             writer.write(handle)
         return _pdf_tool_response(request, output_path, 'extract_pages')
+    except ValueError as exc:
+        return JsonResponse({'error': str(exc)}, status=400)
     except Exception as exc:
         return JsonResponse({'error': f'Extract pages failed: {str(exc)}'}, status=500)
     finally:
@@ -1574,6 +1632,7 @@ def custom_password_reset(request):
                     email_template_name='registration/password_reset_email.html',
                     html_email_template_name='registration/password_reset_email.html',
                     request=request,
+                    domain_override=request.get_host(),
                 )
                 messages.success(request, 'Password reset link has been sent to your email.')
                 logger.info(f"Password reset email sent to {email}")
@@ -1595,14 +1654,38 @@ def password_reset_done(request):
     return render(request, 'registration/password_reset_done.html')
 
 
+class StatelessPasswordResetConfirmView(PasswordResetConfirmView):
+    """Validate reset tokens directly so email-link previews need no session."""
+
+    @method_decorator(sensitive_post_parameters())
+    @method_decorator(never_cache)
+    def dispatch(self, request, *args, **kwargs):
+        self.validlink = False
+        self.user = self.get_user(kwargs['uidb64'])
+        if self.user is not None and self.token_generator.check_token(
+            self.user,
+            kwargs['token'],
+        ):
+            self.validlink = True
+            response = FormView.dispatch(self, request, *args, **kwargs)
+        else:
+            response = self.render_to_response(self.get_context_data())
+        response['Referrer-Policy'] = 'no-referrer'
+        return response
+
+    def form_valid(self, form):
+        user = form.save()
+        if self.post_reset_login:
+            login(self.request, user, self.post_reset_login_backend)
+        return FormView.form_valid(self, form)
+
+
 def password_reset_confirm(request, uidb64, token):
     """View for confirming password reset with token."""
-    from django.contrib.auth.views import PasswordResetConfirmView
-    from django.contrib.auth.forms import SetPasswordForm
-
-    view = PasswordResetConfirmView.as_view(
+    view = StatelessPasswordResetConfirmView.as_view(
         template_name='registration/password_reset_confirm.html',
         post_reset_login=True,
+        post_reset_login_backend=settings.AUTHENTICATION_BACKENDS[0],
     )
     return view(request, uidb64=uidb64, token=token)
 
@@ -1614,26 +1697,30 @@ def password_reset_complete(request):
 
 def login_view(request):
     """Custom login view that authenticates with email instead of username"""
-    from django.contrib.auth import authenticate, login
     from django.contrib.auth.forms import AuthenticationForm
+    from django.utils.http import url_has_allowed_host_and_scheme
     
     if request.method == 'POST':
         email = request.POST.get('email', '').strip()
         password = request.POST.get('password', '')
         
-        # Find user by email (use filter().first() to handle duplicate emails)
-        user_obj = User.objects.filter(email=email).first()
-        username = user_obj.username if user_obj else None
-        
-        # Authenticate with username (Django's authenticate uses username internally)
-        user = authenticate(request, username=username, password=password) if username else None
+        user_obj = User.objects.filter(email__iexact=email).first() if email else None
+        user = (
+            authenticate(request, username=user_obj.username, password=password)
+            if user_obj
+            else None
+        )
         
         if user is not None:
             if user.is_active:
                 login(request, user)
-                next_url = request.POST.get('next', 'index').strip()
-                if not next_url:
-                    next_url = 'index'
+                next_url = request.POST.get('next') or request.GET.get('next', '')
+                if not url_has_allowed_host_and_scheme(
+                    next_url,
+                    allowed_hosts={request.get_host()},
+                    require_https=request.is_secure(),
+                ):
+                    next_url = reverse('index')
                 messages.success(request, f'Welcome back, {user.username}!')
                 return redirect(next_url)
             else:
@@ -1641,11 +1728,12 @@ def login_view(request):
         else:
             messages.error(request, 'Invalid email or password. Please try again.')
     
-    # GET request - show login form
-    from django.contrib.auth.forms import AuthenticationForm
     form = AuthenticationForm()
-    
-    return render(request, 'registration/login.html', {'form': form})
+    return render(request, 'registration/login.html', {
+        'form': form,
+        'next': request.POST.get('next') or request.GET.get('next', ''),
+        'google_unavailable': request.GET.get('google_unavailable') == '1',
+    })
 
 
 # ---------------------------------------------------------------------------

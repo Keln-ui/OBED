@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Academic Admin Dashboard - CoreSynch{% endblock %}
+
+{% block content %}
+<section class="container py-5">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+        <div>
+            <p class="text-uppercase text-primary fw-semibold small mb-1">Academic platform</p>
+            <h1 class="h2 fw-bold mb-1">Academic Admin Dashboard</h1>
+            <p class="text-muted mb-0">Manage learning content, schemes of work, and teaching opportunities.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a class="btn btn-outline-secondary" href="{% url 'admin:index' %}">Django Admin</a>
+            <a class="btn btn-primary" href="{% url 'index' %}">Academic site</a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Subjects</p><p class="display-6 fw-bold mb-0">{{ total_subjects }}</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Revision materials</p><p class="display-6 fw-bold mb-0">{{ total_materials }}</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Material downloads</p><p class="display-6 fw-bold mb-0">{{ total_downloads }}</p>
+            </div></div>
+        </div>
+        <div class="col-6 col-lg-3">
+            <div class="card border-0 shadow-sm h-100"><div class="card-body">
+                <p class="text-muted mb-1">Schemes of work</p><p class="display-6 fw-bold mb-0">{{ total_schemes }}</p>
+            </div></div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-5">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div><h2 class="h5 fw-bold mb-1">Teaching jobs</h2><p class="text-muted small mb-0">Review opportunities before publication.</p></div>
+                        <span class="badge text-bg-warning">{{ pending_jobs }} pending</span>
+                    </div>
+                    <p class="mb-3"><strong>{{ active_jobs }}</strong> approved active jobs</p>
+                    <div class="d-grid gap-2">
+                        <a class="btn btn-primary" href="{% url 'admin_job_approvals' %}">Review job approvals</a>
+                        <a class="btn btn-outline-primary" href="/admin/pdf_converter/jobadvertisement/">Manage job listings</a>
+                    </div>
+                    <hr>
+                    <h3 class="h6 fw-bold">Pending approvals</h3>
+                    <ul class="list-group list-group-flush">
+                        {% for job in pending_job_list %}
+                        <li class="list-group-item px-0">
+                            <span class="fw-semibold">{{ job.title }}</span><br>
+                            <span class="text-muted small">{{ job.school_name }} · {{ job.created_at|date:"M j, Y" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item px-0 text-muted">No jobs waiting for approval.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-7">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body p-4">
+                    <h2 class="h5 fw-bold mb-3">Learning content</h2>
+                    <div class="d-flex flex-wrap gap-2 mb-4">
+                        <a class="btn btn-outline-primary" href="/admin/revision/revisionmaterial/add/">Add revision material</a>
+                        <a class="btn btn-outline-primary" href="/admin/revision/subject/add/">Add subject</a>
+                        <a class="btn btn-outline-primary" href="/admin/revision/schemeofwork/add/">Upload scheme of work</a>
+                        <a class="btn btn-outline-secondary" href="/admin/revision/revisionmaterial/">Browse materials</a>
+                    </div>
+                    <h3 class="h6 fw-bold">Recently added materials</h3>
+                    <ul class="list-group list-group-flush">
+                        {% for material in recent_materials %}
+                        <li class="list-group-item px-0">
+                            <span class="fw-semibold">{{ material.title }}</span><br>
+                            <span class="text-muted small">{{ material.subject.name }} · {{ material.created_at|date:"M j, Y" }}</span>
+                        </li>
+                        {% empty %}
+                        <li class="list-group-item px-0 text-muted">No revision materials have been added yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

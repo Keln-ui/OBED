@@ -38,8 +38,8 @@ This guide will help you set up Google OAuth for your application so users can s
 4. Name: "Word Converter Web Client"
 5. Authorized redirect URIs (add these):
    - For local development:
-     - `http://127.0.0.1:8000/accounts/google/login/callback/`
-     - `http://localhost:8000/accounts/google/login/callback/`
+     - `http://academic.localhost:8000/accounts/google/login/callback/`
+     - `http://converter.localhost:8000/accounts/google/login/callback/`
    - For production (replace with your domain):
      - `https://yourdomain.com/accounts/google/login/callback/`
 6. Click "Create"
@@ -65,11 +65,10 @@ After creating the OAuth client, you'll see:
    - **Client id**: Your Google Client ID
    - **Secret key**: Your Google Client Secret
    - **Key**: (leave empty, will be auto-generated)
-7. Under "Sites", select your site (typically "example.com" or localhost)
+7. Under "Sites", associate the app with the site records matching both local hosts:
    - If you don't see a site, go to "Sites" in admin and add:
-     - Domain: `127.0.0.1:8000` or `localhost:8000`
-     - Name: `localhost`
-     - Display name: `Local Development`
+     - Domain: `academic.localhost:8000`, Name: `academic.localhost`
+     - Domain: `converter.localhost:8000`, Name: `converter.localhost`
 8. Click "Save"
 
 ### Option B: Using Environment Variables (Production)

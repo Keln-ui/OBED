@@ -15,6 +15,21 @@
 
         <div class="card border-0 shadow-sm" style="border-radius: 16px;">
             <div class="card-body p-4">
+                {% if google_unavailable %}
+                    <div class="alert alert-warning" role="alert">
+                        Google sign-in is not configured yet. Please sign in with your email and password.
+                    </div>
+                {% endif %}
+
+                {% if messages %}
+                    {% for message in messages %}
+                    <div class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                    {% endfor %}
+                {% endif %}
+
                 {% if form.errors %}
                     <div class="alert alert-danger d-flex align-items-center" role="alert">
                         <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -38,6 +53,7 @@
 
                 <form method="post" action="{% url 'login' %}">
                     {% csrf_token %}
+                    {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
                     
                     <div class="mb-3">
                         <label for="id_email" class="form-label fw-medium" style="color: #1e293b;">
@@ -59,8 +75,6 @@
                                placeholder="Enter your password">
                     </div>
 
-                    <input type="hidden" name="next" value="{{ next }}">
-
                     <button type="submit" class="btn btn-lg w-100 mt-2"
                             style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border: none; border-radius: 10px; padding: 0.75rem; font-weight: 600; color: white;">
                         <i class="bi bi-box-arrow-in-right me-2"></i> Sign In
@@ -78,7 +92,7 @@
                     <span class="position-absolute top-50 start-50 translate-middle bg-white px-3 text-muted" style="font-size: 0.85rem;">OR</span>
                 </div>
 
-                <a href="{% url 'google_login' %}" class="btn btn-lg w-100 d-flex align-items-center justify-content-center gap-2"
+                <a href="{% url 'google_login_entry' %}" class="btn btn-lg w-100 d-flex align-items-center justify-content-center gap-2"
                    style="background: white; border: 1px solid #d1d5db; border-radius: 10px; padding: 0.75rem; font-weight: 500; color: #374151; text-decoration: none;">
                     <svg width="20" height="20" viewBox="0 0 24 24">
                         <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>

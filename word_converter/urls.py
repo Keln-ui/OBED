@@ -19,6 +19,11 @@ urlpatterns = [
     path('admin/payment-settings/', admin_views.admin_payment_settings, name='admin_payment_settings'),
     path('admin/dashboard/', admin_views.admin_dashboard, name='admin_dashboard_custom'),
     path('admin/', admin.site.urls),
+    path(
+        'google-login/',
+        pdf_converter.views.google_login_entry,
+        name='google_login_entry',
+    ),
     # Django Allauth URLs (social authentication) - must come before custom login
     path('accounts/', include('allauth.urls')),
     # Custom password reset override

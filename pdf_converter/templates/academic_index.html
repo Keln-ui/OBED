@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}CoreSynch Academic Platform{% endblock %}
+
+{% block content %}
+<section class="academic-hero">
+  <div class="academic-hero-orb academic-hero-orb-one" aria-hidden="true"></div>
+  <div class="academic-hero-orb academic-hero-orb-two" aria-hidden="true"></div>
+  <div class="container">
+    <div class="academic-hero-layout">
+      <div class="academic-hero-copy">
+        <p class="academic-eyebrow"><span></span> YOUR SPACE TO LEARN &amp; TEACH</p>
+        <h1>Learn more.<br><span>Teach with confidence.</span></h1>
+        <p class="academic-intro">
+          Find useful revision resources, discover teaching opportunities, and plan your next lesson—all from one welcoming space.
+        </p>
+        <div class="academic-actions">
+          <a class="academic-button academic-button-primary" href="{% url 'revision_home' %}">
+            Explore learning resources <i class="bi bi-arrow-right"></i>
+          </a>
+          <a class="academic-button academic-button-secondary" href="{% url 'bom_jobs' %}">
+            Find a teaching role <i class="bi bi-briefcase"></i>
+          </a>
+        </div>
+        <div class="academic-trust-note"><i class="bi bi-check-circle-fill"></i> Practical support for Kenyan teachers and learners</div>
+      </div>
+      <div class="academic-preview" aria-label="Academic platform overview">
+        <div class="academic-preview-top">
+          <div class="academic-preview-brand">
+            <span class="academic-preview-brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
+            <span><strong>Academic hub</strong><small>Your next step starts here</small></span>
+          </div>
+          <span class="academic-preview-dots" aria-hidden="true"><i class="bi bi-three-dots"></i></span>
+        </div>
+        <div class="academic-preview-highlight">
+          <span class="academic-preview-label">LEARN AT YOUR PACE</span>
+          <h2>Resources for every classroom</h2>
+          <p>Explore revision materials and make lesson planning feel simpler.</p>
+          <a href="{% url 'revision_home' %}">Open the library <i class="bi bi-arrow-up-right"></i></a>
+          <span class="academic-preview-art" aria-hidden="true"><i class="bi bi-journal-richtext"></i></span>
+        </div>
+        <div class="academic-preview-bottom">
+          <a href="{% url 'sow_generator' %}" class="academic-preview-shortcut">
+            <span class="academic-preview-shortcut-icon academic-shortcut-amber"><i class="bi bi-calendar2-check"></i></span>
+            <span><strong>Plan a lesson</strong><small>Scheme of work</small></span>
+            <i class="bi bi-arrow-up-right"></i>
+          </a>
+          <a href="{% url 'bom_jobs' %}" class="academic-preview-shortcut">
+            <span class="academic-preview-shortcut-icon academic-shortcut-green"><i class="bi bi-briefcase"></i></span>
+            <span><strong>New opportunity</strong><small>{{ featured_jobs|length }} featured roles</small></span>
+            <i class="bi bi-arrow-up-right"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="academic-stats">
+      <div><strong>{{ total_materials }}+</strong><span>learning resources</span></div>
+      <div><strong>{{ featured_jobs|length }}+</strong><span>featured opportunities</span></div>
+      <div><strong>Free</strong><span>lesson planning tools</span></div>
+      <span class="academic-stats-caption">Everything you need to keep growing.</span>
+    </div>
+  </div>
+</section>
+
+<section class="academic-tools-section">
+  <div class="container">
+    <div class="academic-section-heading">
+      <span>MADE FOR YOUR EVERYDAY</span>
+      <h2>Good things happen when you have the right tools</h2>
+      <p>Pick up where you are and take the next step in your teaching or learning journey.</p>
+    </div>
+    <div class="academic-tools-grid">
+      <a class="academic-tool-card academic-tool-materials" href="{% url 'revision_home' %}">
+        <span class="academic-tool-icon"><i class="bi bi-journal-bookmark"></i></span>
+        <span class="academic-tool-kicker">LEARN</span>
+        <h3>Revision materials</h3>
+        <p>Explore study notes, schemes, and resources to support confident learning.</p>
+        <span class="academic-tool-link">Explore the library <i class="bi bi-arrow-up-right"></i></span>
+      </a>
+      <a class="academic-tool-card academic-tool-jobs" href="{% url 'bom_jobs' %}">
+        <span class="academic-tool-icon"><i class="bi bi-briefcase"></i></span>
+        <span class="academic-tool-kicker">GROW</span>
+        <h3>Teaching opportunities</h3>
+        <p>Discover BOM and homeschooling roles from schools and families.</p>
+        <span class="academic-tool-link">View opportunities <i class="bi bi-arrow-up-right"></i></span>
+      </a>
+      <a class="academic-tool-card academic-tool-planning" href="{% url 'sow_generator' %}">
+        <span class="academic-tool-icon"><i class="bi bi-calendar2-week"></i></span>
+        <span class="academic-tool-kicker">PLAN</span>
+        <h3>Scheme of work</h3>
+        <p>Turn your lesson ideas into a clear, ready-to-use scheme.</p>
+        <span class="academic-tool-link">Plan a lesson <i class="bi bi-arrow-up-right"></i></span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<section class="academic-jobs-section">
+  <div class="container">
+    <div class="academic-jobs-heading">
+      <div>
+        <span>YOUR NEXT CHAPTER</span>
+        <h2>Find a teaching opportunity</h2>
+      </div>
+      <a href="{% url 'bom_jobs' %}">Browse all jobs <i class="bi bi-arrow-right"></i></a>
+    </div>
+    <div class="academic-jobs-grid">
+      {% for job in featured_jobs|slice:":3" %}
+      <article class="academic-job-card">
+        <span class="academic-job-type">
+          {% if job.job_type == 'bom' %}BOM SCHOOL{% else %}HOMESCHOOL{% endif %}
+        </span>
+        <h3>{{ job.title }}</h3>
+        <p class="academic-job-school">{{ job.school_name }}</p>
+        <p class="academic-job-location"><i class="bi bi-geo-alt"></i> {{ job.location }}</p>
+        <a href="{% if job.job_type == 'bom' %}{% url 'bom_jobs' %}{% else %}{% url 'homeschooling_jobs' %}{% endif %}">
+          View opportunity <i class="bi bi-arrow-up-right"></i>
+        </a>
+      </article>
+      {% empty %}
+      <article class="academic-job-card academic-job-empty">
+        <span class="academic-job-type">BOM &amp; HOMESCHOOL</span>
+        <h3>Find your next teaching opportunity</h3>
+        <p>Browse current openings for classroom teachers and homeschool tutors.</p>
+        <a href="{% url 'bom_jobs' %}">Browse teaching jobs <i class="bi bi-arrow-right"></i></a>
+      </article>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

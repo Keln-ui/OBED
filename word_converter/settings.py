@@ -18,7 +18,15 @@ SECRET_KEY = 'django-insecure-your-secret-key-here-change-in-production'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.environ.get('ALLOWED_HOSTS', '*').split(',')
+    if host.strip()
+]
+ACADEMIC_HOST = os.environ.get('ACADEMIC_HOST', 'academic.localhost')
+CONVERTER_HOST = os.environ.get('CONVERTER_HOST', 'converter.localhost')
+SITE_SCHEME = os.environ.get('SITE_SCHEME', 'http' if DEBUG else 'https')
+SESSION_COOKIE_DOMAIN = os.environ.get('SESSION_COOKIE_DOMAIN') or None
 
 
 # Application definition
@@ -64,6 +72,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'pdf_converter.context_processors.platform_links',
             ],
         },
     },
@@ -197,7 +206,17 @@ CSRF_COOKIE_SECURE = False  # Set to True in production with HTTPS
 SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
 CSRF_COOKIE_HTTPONLY = True
 SESSION_COOKIE_HTTPONLY = True
-CSRF_TRUSTED_ORIGINS = ['http://127.0.0.1:8000', 'http://localhost:8000', 'https://*.ngrok-free.app', 'https://*.ngrok.io']
+CSRF_COOKIE_DOMAIN = os.environ.get('CSRF_COOKIE_DOMAIN') or SESSION_COOKIE_DOMAIN
+CSRF_TRUSTED_ORIGINS = [
+    'http://127.0.0.1:8000',
+    'http://localhost:8000',
+    'https://*.ngrok-free.app',
+    'https://*.ngrok.io',
+] + [
+    f'{scheme}://{host}'
+    for host in (ACADEMIC_HOST, CONVERTER_HOST)
+    for scheme in (('http', 'https') if DEBUG else (SITE_SCHEME,))
+]
 
 # Email Configuration for Password Reset
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

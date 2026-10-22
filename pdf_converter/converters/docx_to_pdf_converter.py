@@ -4,6 +4,10 @@ This conversion is FREE (no payment required).
 """
 import os
 import logging
+import shutil
+import subprocess
+import tempfile
+from xml.sax.saxutils import escape
 from docx import Document
 from io import BytesIO
 
@@ -16,10 +20,14 @@ class DocxToPdfConverter:
     def __init__(self, docx_path: str, output_path: str):
         self.docx_path = docx_path
         self.output_path = output_path
+        self.error_message = None
 
     def convert(self) -> bool:
         """Convert a .docx file to PDF. Returns True if successful."""
         try:
+            if self._convert_with_libreoffice():
+                return True
+
             from reportlab.lib.pagesizes import A4
             from reportlab.lib.units import mm, cm
             from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
@@ -85,7 +93,7 @@ class DocxToPdfConverter:
                                 topMargin=2*cm,
                                 bottomMargin=2*cm,
                             )
-                            elements = [Paragraph(full_text[:10000], ParagraphStyle('Body', fontSize=10, leading=14))]
+                            elements = [Paragraph(escape(full_text[:10000]), ParagraphStyle('Body', fontSize=10, leading=14))]
                             doc_template.build(elements)
                             logger.info(f"Extracted text from corrupted docx, saved to PDF")
                             return True
@@ -152,37 +160,34 @@ class DocxToPdfConverter:
                 style_name = para.style.name if para.style else 'Normal'
 
                 if 'Title' in style_name:
-                    elements.append(Paragraph(text, title_style))
+                    elements.append(Paragraph(escape(text), title_style))
                 elif 'Heading 1' in style_name or 'heading 1' in style_name.lower():
-                    elements.append(Paragraph(text, heading_style))
+                    elements.append(Paragraph(escape(text), heading_style))
                 elif 'Heading 2' in style_name or 'heading 2' in style_name.lower():
-                    elements.append(Paragraph(text, heading2_style))
+                    elements.append(Paragraph(escape(text), heading2_style))
                 elif 'Heading 3' in style_name or 'heading 3' in style_name.lower():
                     h3 = ParagraphStyle('H3', parent=heading2_style, fontSize=12, leading=16)
-                    elements.append(Paragraph(text, h3))
+                    elements.append(Paragraph(escape(text), h3))
                 else:
-                    elements.append(Paragraph(text, normal_style))
+                    elements.append(Paragraph(escape(text), normal_style))
 
             # Handle tables
             for table in doc.tables:
                 try:
-                    table_data = []
                     num_cols = len(table.columns)
-                    for row in table.rows:
-                        row_data = []
-                        for cell in row.cells:
-                            cell_text = cell.text.strip() or ' '
-                            row_data.append(Paragraph(cell_text, normal_style))
-                        table_data.append(row_data)
+                    if not num_cols:
+                        continue
+                    page_width = A4[0] - 4*cm
+                    col_width = page_width / num_cols
+                    col_widths = [col_width] * num_cols
+                    available_height = A4[1] - 4*cm
+                    table_data = []
 
-                    if table_data:
-                        # Calculate column widths based on page width
-                        page_width = A4[0] - 4*cm  # usable width
-                        col_width = max(1.5*cm, page_width / num_cols) if num_cols > 0 else page_width
-                        col_widths = [col_width] * num_cols
-                        
-                        t = Table(table_data, colWidths=col_widths)
-                        t.setStyle(TableStyle([
+                    def append_table_segment(rows):
+                        if not rows:
+                            return
+                        table_flowable = Table(rows, colWidths=col_widths, splitInRow=1)
+                        table_flowable.setStyle(TableStyle([
                             ('GRID', (0, 0), (-1, -1), 0.5, HexColor('#cccccc')),
                             ('BACKGROUND', (0, 0), (-1, 0), HexColor('#e8edf5')),
                             ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
@@ -191,20 +196,86 @@ class DocxToPdfConverter:
                             ('TOPPADDING', (0, 0), (-1, -1), 2),
                             ('BOTTOMPADDING', (0, 0), (-1, -1), 2),
                         ]))
-                        elements.append(t)
+                        elements.append(table_flowable)
                         elements.append(Spacer(1, 12))
+
+                    for row in table.rows:
+                        cell_texts = [cell.text.strip() for cell in row.cells]
+                        row_data = [
+                            Paragraph(escape(cell_text).replace('\n', '<br/>'), normal_style)
+                            for cell_text in cell_texts
+                        ]
+                        if any(
+                            paragraph.wrap(col_width - 6, available_height * 2)[1] > available_height
+                            for paragraph in row_data
+                        ):
+                            append_table_segment(table_data)
+                            table_data = []
+                            for cell_text in cell_texts:
+                                if cell_text:
+                                    elements.append(Paragraph(
+                                        escape(cell_text).replace('\n', '<br/>'),
+                                        normal_style,
+                                    ))
+                                    elements.append(Spacer(1, 4))
+                            elements.append(Spacer(1, 8))
+                        else:
+                            table_data.append(row_data)
+                    append_table_segment(table_data)
                 except Exception as table_err:
                     logger.warning(f"Could not render table, adding as text: {table_err}")
                     # Fallback: render table as plain text
                     for row in table.rows:
                         row_text = " | ".join(cell.text.strip() for cell in row.cells)
                         if row_text.strip():
-                            elements.append(Paragraph(row_text, normal_style))
+                            elements.append(Paragraph(escape(row_text), normal_style))
 
             doc_template.build(elements)
             logger.info(f"Successfully converted {self.docx_path} to PDF: {self.output_path}")
             return True
 
         except Exception as e:
-            logger.error(f"Error converting DOCX to PDF: {str(e)}")
+            self.error_message = (
+                'The Word document contains content that could not be laid out. '
+                'Try installing LibreOffice for full formatting support, or simplify unusually large tables.'
+            )
+            logger.exception("Error converting DOCX to PDF: %s", e)
             return False
+
+    def _convert_with_libreoffice(self) -> bool:
+        """Use LibreOffice's document renderer when installed to preserve Word layout."""
+        executable = shutil.which('soffice') or shutil.which('libreoffice')
+        if not executable:
+            return False
+
+        output_dir = os.path.dirname(os.path.abspath(self.output_path))
+        os.makedirs(output_dir, exist_ok=True)
+        with tempfile.TemporaryDirectory(prefix='docx_to_pdf_') as temp_dir:
+            profile_uri = (os.path.join(temp_dir, 'profile')).replace(os.sep, '/')
+            result_dir = os.path.join(temp_dir, 'output')
+            os.makedirs(result_dir)
+            command = [
+                executable,
+                '--headless',
+                f'-env:UserInstallation=file:///{profile_uri.lstrip("/")}',
+                '--convert-to',
+                'pdf',
+                '--outdir',
+                result_dir,
+                os.path.abspath(self.docx_path),
+            ]
+            result = subprocess.run(command, capture_output=True, text=True, timeout=180)
+            rendered_pdf = os.path.join(
+                result_dir,
+                os.path.splitext(os.path.basename(self.docx_path))[0] + '.pdf',
+            )
+            if result.returncode != 0 or not os.path.isfile(rendered_pdf):
+                logger.warning(
+                    "LibreOffice DOCX rendering failed (exit %s): %s",
+                    result.returncode,
+                    result.stderr.strip() or result.stdout.strip(),
+                )
+                return False
+
+            shutil.copyfile(rendered_pdf, self.output_path)
+            return True
