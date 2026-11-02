@@ -295,9 +295,23 @@ body {
   bottom: -8px;
 }
 
+.navbar-modern > .container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+}
+
 .navbar-collapse-modern {
   flex-grow: 1;
   display: flex;
+}
+
+/* Bootstrap's .collapse:not(.show) would otherwise hide the links on desktop */
+@media (min-width: 1200px) {
+  .navbar-collapse-modern.collapse {
+    display: flex !important;
+  }
 }
 
 .navbar-nav-modern {
@@ -317,7 +331,7 @@ body {
 .nav-link-modern {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.25rem;
+  padding: 0.75rem 1rem;
   color: rgba(255, 255, 255, 0.7);
   text-decoration: none;
   font-size: 0.95rem;
@@ -379,7 +393,7 @@ body {
   background: rgba(239, 68, 68, 0.1);
 }
 
-@media (max-width: 992px) {
+@media (max-width: 1199.98px) {
   .navbar-toggler-modern {
     display: block;
   }
@@ -401,6 +415,8 @@ body {
     flex-direction: column;
     align-items: stretch;
     gap: 0.25rem;
+    width: 100%;
+    margin-left: 0;
   }
 
   .nav-link-modern {
